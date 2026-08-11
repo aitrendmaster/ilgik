@@ -1,0 +1,44 @@
+{
+  "_note": "기계번역 초안 — 원어민 검수 필요. 검수 여부는 src/lib/i18n/config.ts가 단일 출처.",
+  "common": {
+    "appName": "दैनिक ज्याला नोट",
+    "save": "सुरक्षित",
+    "cancel": "रद्द",
+    "undo": "फिर्ता",
+    "back": "पछाडि",
+    "close": "बन्द",
+    "settings": "सेटिङ",
+    "hours": "{h} घण्टा",
+    "won": "{amount} वोन"
+  },
+  "nav": {
+    "home": "गृह",
+    "calendar": "पात्रो",
+    "workplaces": "काम गर्ने ठाउँ",
+    "settings": "सेटिङ"
+  },
+  "home": {
+    "netLabel": "यो महिना तपाईंले पाउने",
+    "gross": "कटौती अघि",
+    "deduction": "कटौती",
+    "unpaid": "अझै नपाएको",
+    "cta": "आजको काम लेख्नुहोस्",
+    "recent": "हालैको",
+    "emptyWorkplace": "पहिले काम गर्ने ठाउँ थप्नुहोस्",
+    "emptyWorkplaceCta": "काम गर्ने ठाउँ थप्नुहोस्",
+    "emptyLog": "आज काम गर्नुभयो भने यहाँ थिच्नुहोस्"
+  },
+  "worklog": {
+    "unpaidChip": "नपाएको",
+    "regular": "आधारभूत",
+    "overtime": "ओभरटाइम",
+    "holiday": "बिदाको दिन",
+    "holidayOver": "बिदा थप",
+    "night": "रात",
+    "flat": "आधारभूत"
+  },
+  "phase": {
+    "comingSoon": "अर्को चरणमा आउँछ",
+    "comingSoonBody": "अहिलेसम्म ज्याला गणना इन्जिन र स्क्रिनको ढाँचा तयार छ।"
+  }
+}

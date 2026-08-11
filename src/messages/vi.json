@@ -1,0 +1,44 @@
+{
+  "_note": "기계번역 초안 — 원어민 검수 필요. 검수 여부는 src/lib/i18n/config.ts가 단일 출처.",
+  "common": {
+    "appName": "Sổ Công Nhật",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "undo": "Hoàn tác",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "settings": "Cài đặt",
+    "hours": "{h} giờ",
+    "won": "{amount} won"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "calendar": "Lịch",
+    "workplaces": "Nơi làm",
+    "settings": "Cài đặt"
+  },
+  "home": {
+    "netLabel": "Tháng này bạn nhận",
+    "gross": "Trước khấu trừ",
+    "deduction": "Khấu trừ",
+    "unpaid": "Chưa được trả",
+    "cta": "Ghi công hôm nay",
+    "recent": "Gần đây",
+    "emptyWorkplace": "Trước tiên, thêm nơi bạn làm việc",
+    "emptyWorkplaceCta": "Thêm nơi làm việc",
+    "emptyLog": "Bấm vào đây nếu hôm nay bạn đã làm"
+  },
+  "worklog": {
+    "unpaidChip": "Chưa trả",
+    "regular": "Cơ bản",
+    "overtime": "Tăng ca",
+    "holiday": "Ngày lễ",
+    "holidayOver": "Lễ vượt giờ",
+    "night": "Ban đêm",
+    "flat": "Cơ bản"
+  },
+  "phase": {
+    "comingSoon": "Sẽ có ở bước tiếp theo",
+    "comingSoonBody": "Hiện đã xong phần tính lương và khung màn hình."
+  }
+}

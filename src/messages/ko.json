@@ -1,0 +1,50 @@
+{
+  "common": {
+    "appName": "일당노트",
+    "save": "저장",
+    "cancel": "취소",
+    "undo": "되돌리기",
+    "back": "뒤로",
+    "close": "닫기",
+    "settings": "설정",
+    "hours": "{h}시간",
+    "won": "{amount}원"
+  },
+  "nav": {
+    "home": "홈",
+    "calendar": "달력",
+    "workplaces": "근무지",
+    "settings": "설정"
+  },
+  "home": {
+    "netLabel": "이번 달 받을 돈",
+    "gross": "세전 합계",
+    "deduction": "공제",
+    "unpaid": "아직 못 받은 돈",
+    "cta": "오늘 기록하기",
+    "recent": "최근 기록",
+    "emptyWorkplace": "먼저 일하는 곳을 만들어요",
+    "emptyWorkplaceCta": "근무지 만들기",
+    "emptyLog": "오늘 일했으면 눌러주세요"
+  },
+  "worklog": {
+    "unpaidChip": "미지급",
+    "regular": "기본",
+    "overtime": "연장",
+    "holiday": "특근",
+    "holidayOver": "특근 초과",
+    "night": "야간",
+    "flat": "기본"
+  },
+  "legal": {
+    "estimate": "예상 금액이에요",
+    "disclaimer": "이 금액은 예상이에요. 실제 받는 돈과 다를 수 있어요.",
+    "under5": "같이 일하는 사람이 5명보다 적으면 1.5배 수당이 없어요.",
+    "weeklyRest": "일주일에 15시간 넘게 일하면 하루치를 더 받을 권리가 있어요.",
+    "report": "돈을 못 받으면 {tel}으로 전화하세요. 통역이 있어요."
+  },
+  "phase": {
+    "comingSoon": "다음 단계에서 만들어요",
+    "comingSoonBody": "지금은 계산 엔진과 화면 뼈대까지 되어 있어요."
+  }
+}

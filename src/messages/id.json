@@ -1,0 +1,44 @@
+{
+  "_note": "기계번역 초안 — 원어민 검수 필요. 검수 여부는 src/lib/i18n/config.ts가 단일 출처.",
+  "common": {
+    "appName": "Catatan Harian",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "undo": "Urungkan",
+    "back": "Kembali",
+    "close": "Tutup",
+    "settings": "Pengaturan",
+    "hours": "{h} jam",
+    "won": "{amount} won"
+  },
+  "nav": {
+    "home": "Beranda",
+    "calendar": "Kalender",
+    "workplaces": "Tempat",
+    "settings": "Pengaturan"
+  },
+  "home": {
+    "netLabel": "Bulan ini kamu terima",
+    "gross": "Sebelum potongan",
+    "deduction": "Potongan",
+    "unpaid": "Belum dibayar",
+    "cta": "Catat kerja hari ini",
+    "recent": "Terbaru",
+    "emptyWorkplace": "Tambahkan dulu tempat kamu bekerja",
+    "emptyWorkplaceCta": "Tambah tempat kerja",
+    "emptyLog": "Tekan di sini kalau hari ini kamu bekerja"
+  },
+  "worklog": {
+    "unpaidChip": "Belum dibayar",
+    "regular": "Dasar",
+    "overtime": "Lembur",
+    "holiday": "Hari libur",
+    "holidayOver": "Libur lebih",
+    "night": "Malam",
+    "flat": "Dasar"
+  },
+  "phase": {
+    "comingSoon": "Ada di langkah berikutnya",
+    "comingSoonBody": "Sejauh ini mesin hitung gaji dan kerangka layar sudah selesai."
+  }
+}

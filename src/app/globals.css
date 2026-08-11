@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════
+   디자인 토큰 — docs/DESIGN-ILGIK.md
+   색·타이포·컴포넌트 규격은 이 문서가 기획서보다 우선한다.
+   토큰 이름은 원본 문서와 1:1로 맞춘다. 새 색을 임의로 만들지 않는다.
+   ═══════════════════════════════════════════════════════════════ */
+@theme {
+  /* Brand & Accent */
+  --color-primary: #1c1c1e;
+  --color-on-primary: #ffffff;
+  --color-brand-yellow: #ffd02f;
+  --color-brand-yellow-deep: #fcb900;
+  --color-yellow-light: #fff4c4;
+  --color-yellow-dark: #746019;
+  --color-surface-yellow: #fff8e0;
+  --color-brand-blue: #4262ff;
+  --color-blue-pressed: #2a41b6;
+  --color-brand-coral: #ff9999;
+  --color-coral-light: #ffc6c6;
+  --color-coral-dark: #600000;
+  --color-brand-rose: #ffd8f4;
+  --color-rose-light: #fde0f0;
+  --color-brand-teal: #0fbcb0;
+  --color-teal-light: #c3faf5;
+  --color-moss-dark: #187574;
+  --color-orange-light: #ffe6cd;
+  --color-brand-red: #fbd4d4;
+  --color-success: #00b473;
+
+  /* Surface */
+  --color-canvas: #ffffff;
+  --color-surface: #f7f8fa;
+  --color-surface-soft: #fafbfc;
+  --color-featured: #f5f3ff;
+  --color-hairline: #e0e2e8;
+  --color-hairline-soft: #eef0f3;
+  --color-hairline-strong: #c7cad5;
+
+  /* Text */
+  --color-ink-deep: #050038;
+  --color-ink: #1c1c1e;
+  --color-charcoal: #2c2c34;
+  --color-slate: #555a6a;
+  --color-steel: #6b6f7e;
+  --color-stone: #8e91a0;
+  --color-muted: #a5a8b5;
+
+  /* Radius — 모든 버튼·칩·탭·배지는 full */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 20px;
+  --radius-xxxl: 28px;
+  --radius-feature: 32px;
+
+  /* Roobert PRO는 한글 글리프가 없다. 설치 환경에서만 라틴에 쓰이고
+     실제 렌더는 Pretendard가 담당한다.
+     --font-script는 크메르·데바나가리처럼 별도 폰트가 필요한 언어를 고를 때만
+     LocaleFont가 주입한다. 그 외에는 비어 있어 무시된다. */
+  --font-sans:
+    'Roobert PRO', var(--font-script, 'Pretendard Variable'), 'Pretendard Variable', Pretendard,
+    -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI',
+    'Noto Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, 'DejaVu Sans Mono', monospace;
+}
+
+/* 근무지 스티키 팔레트 8종.
+   DESIGN-ILGIK의 파스텔만으로는 8개를 구분할 수 없어(coral-light / brand-red /
+   orange-light가 모두 warm pale) Known Gaps의 "실제 스티키는 마케팅 지면보다
+   진하다"를 근거로 파스텔 5 + 진한 3으로 구성해 명도까지 갈랐다.
+   색맹 대응은 이모지 병행으로 보강한다. */
+:root {
+  --wp-1: #ffd02f;
+  --wp-2: #ffc6c6;
+  --wp-3: #c3faf5;
+  --wp-4: #ffd8f4;
+  --wp-5: #ffe6cd;
+  --wp-6: #4262ff;
+  --wp-7: #0fbcb0;
+  --wp-8: #050038;
+}
+
+/* 단일 라이트 테마. DESIGN-ILGIK가 다크 토큰을 정의하지 않으므로(Known Gaps)
+   임의로 만들지 않고 모든 색을 명시적으로 칠한다. */
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--color-surface);
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  /* 현장에서 한 손으로 쓴다. 스크롤 튕김을 줄인다 */
+  overscroll-behavior-y: none;
+}
+
+/* 금액·시간 숫자는 세로로 정렬됐을 때 흔들리면 안 된다 */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

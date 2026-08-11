@@ -1,0 +1,50 @@
+{
+  "common": {
+    "appName": "Ilddang Note",
+    "save": "Save",
+    "cancel": "Cancel",
+    "undo": "Undo",
+    "back": "Back",
+    "close": "Close",
+    "settings": "Settings",
+    "hours": "{h} hours",
+    "won": "{amount} won"
+  },
+  "nav": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "workplaces": "Places",
+    "settings": "Settings"
+  },
+  "home": {
+    "netLabel": "You get this month",
+    "gross": "Before deduction",
+    "deduction": "Deducted",
+    "unpaid": "Not paid yet",
+    "cta": "Add today's work",
+    "recent": "Recent",
+    "emptyWorkplace": "First, add where you work",
+    "emptyWorkplaceCta": "Add a workplace",
+    "emptyLog": "Tap here if you worked today"
+  },
+  "worklog": {
+    "unpaidChip": "Not paid",
+    "regular": "Basic",
+    "overtime": "Overtime",
+    "holiday": "Holiday",
+    "holidayOver": "Holiday extra",
+    "night": "Night",
+    "flat": "Basic"
+  },
+  "legal": {
+    "estimate": "This is an estimate",
+    "disclaimer": "This is an estimate. The real amount may be different.",
+    "under5": "If fewer than 5 people work there, the 1.5x rate is not required by law.",
+    "weeklyRest": "If you work more than 15 hours a week, you have the right to one extra day's pay.",
+    "report": "If you are not paid, call {tel}. Interpreters are available."
+  },
+  "phase": {
+    "comingSoon": "Coming in the next step",
+    "comingSoonBody": "The pay engine and screen shell are done so far."
+  }
+}

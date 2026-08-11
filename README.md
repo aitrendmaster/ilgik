@@ -69,8 +69,8 @@
 
 | Phase | 범위 | 상태 |
 |---|---|---|
-| **0** | 셋업, 디자인 토큰, i18n 골격, PWA 껍데기 | ⬜ |
-| **1-A** | 급여 계산 엔진 + Vitest (T1~T14) | ⬜ |
+| **0** | 셋업, 디자인 토큰, i18n 골격, PWA, Vercel 배포 | ✅ |
+| **1-A** | 급여 계산 엔진 + Vitest (22 케이스) | ✅ |
 | **1-B** | Dexie 스키마 + 근무지 관리 | ⬜ |
 | **1-C** | 기록 입력 3스텝 | ⬜ |
 | **1-D** | 달력 + 월정산 + JSON 백업/복원 | ⬜ |
@@ -81,6 +81,48 @@
 | **3** | PDF·이미지 내보내기, 사진 첨부, 주휴수당, 환율, 권리 안내 | ⬜ |
 
 **MVP = Phase 0 ~ 1-G.** 서버 없이 Vercel 단독으로 완결됩니다.
+
+---
+
+## 개발
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm test         # 급여 엔진 테스트 (Vitest)
+npm run lint     # tsc --noEmit
+npm run build    # 정적 export → out/
+npm run icons    # PWA 아이콘 재생성 (의존성 없이 PNG 직접 인코딩)
+```
+
+### 배포 (Vercel)
+
+프레임워크 자동 감지로 별도 설정 없이 붙습니다.
+
+| 항목 | 값 |
+|---|---|
+| Framework Preset | Next.js |
+| Build Command | `npm run build` |
+| Output Directory | (자동) |
+| 환경변수 | 없음 — Phase 1은 서버를 쓰지 않습니다 |
+
+`output: 'export'`로 정적 빌드되며, `vercel.json`에 보안 헤더와
+`sw.js` 무캐시 정책이 들어 있습니다.
+Phase 2에서 Render API를 붙일 때 `NEXT_PUBLIC_API_URL`을 추가합니다.
+
+### 현재 구현 범위
+
+| 영역 | 상태 |
+|---|---|
+| `src/lib/payroll` | ✅ 급여 엔진 + 22개 테스트. 연도별 요율 테이블, 4종 공제, 5인 미만, 자정 넘김, 야간 비례배분 |
+| `src/lib/db` | ✅ Dexie 스키마 v1 (Phase 1-B에서 UI와 연결) |
+| `src/lib/i18n` | ✅ 6개 로케일 + 검수 게이트 + 언어별 폰트 동적 로드 |
+| `src/app/page.tsx` | ✅ 홈 — 실제 엔진이 계산한 데모 데이터 |
+| `src/app/settings` | ✅ 언어 전환 (미검수 언어는 법률 문구를 영어로 대체) |
+| 달력 · 근무지 · 기록 입력 | ⬜ Phase 1-B ~ 1-E |
+
+> 홈 화면 금액은 **하드코딩이 아니라 `src/lib/seed.ts`가 급여 엔진을 호출해 만든 값**입니다.
+> 엔진을 고치면 화면도 같이 움직이므로 배포본에서 계산 결과를 눈으로 검증할 수 있습니다.
 
 ---
 

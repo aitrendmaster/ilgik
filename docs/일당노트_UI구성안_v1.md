@@ -183,10 +183,10 @@ DESIGN-ILGIK의 파스텔은 서로 너무 가깝다(`coral-light` / `brand-red`
 **정산 카드 축약형**
 ```
 받을 돈                          ← body-sm / steel
-2,230,291원                     ← 48 / 500 / success-accent / -1.5px
+2,230,290원                     ← 48 / 500 / success-accent / -1.5px
 ──────────────────────────      ← 1px dashed hairline-strong, margin 0 -20px
 세전 합계          2,314,120원   ← body-sm, key-value
-공제               −83,829원     ← coral-dark
+공제               −83,830원     ← coral-dark
 ```
 소계·안내박스는 월정산 전용. 홈에는 없다.
 
@@ -344,10 +344,10 @@ DESIGN-ILGIK의 파스텔은 서로 너무 가깝다(`coral-light` / `brand-red`
 ```
 [예상 금액이에요]  ← badge-tag-coral, 우상단
 받을 돈                          ← 14 / 500 / steel
-2,230,291원                     ← 48 / 500 / success-accent / -1.5px
+2,230,290원                     ← 48 / 500 / success-accent / -1.5px
 ──────────────────────────
 세전 합계          2,314,120원
-공제               −83,829원     ← coral-dark
+공제               −83,830원     ← coral-dark
 ──────────────────────────
 근무지별 소계 (스티키 색 사각 + 이모지 + 이름 + 일수·시간 + 금액)
                                  comparison-row 규격: hairline-soft 구분선
