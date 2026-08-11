@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { BreakPicker } from '@/components/worklog/BreakPicker'
 import { COLOR_TOKENS, EMOJIS, colorVar, isDarkToken } from '@/lib/db/palette'
 import { archiveWorkplace, createWorkplace, updateWorkplace } from '@/lib/db/repo'
 import { useWorkplace, useWorkplaces } from '@/lib/db/hooks'
@@ -337,17 +338,14 @@ export function WorkplaceSheet() {
       </Field>
 
       {/* 휴게시간 */}
-      <Field label="쉬는 시간">
-        <Stepper
+      <Field label="보통 쉬는 시간">
+        <BreakPicker
           value={form.defaultBreakMinutes}
-          step={30}
-          min={0}
-          max={240}
           onChange={(v) => patch({ defaultBreakMinutes: v })}
-          format={(v) => `${v}분`}
         />
         <p className="m-0 text-[12.5px] leading-snug text-steel">
-          출퇴근 시각을 넣을 때만 빼요. 시간만 넣을 때는 안 빼요.
+          기록할 때 이 값이 먼저 들어가요. 그날그날 바꿀 수 있어요.
+          출퇴근 시각을 넣을 때만 빼고, 시간만 넣을 때는 빼지 않아요.
         </p>
       </Field>
 

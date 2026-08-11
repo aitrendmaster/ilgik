@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Screen } from '@/components/Screen'
 import { Toggle } from '@/components/workplace/WorkplaceSheet'
@@ -9,6 +10,7 @@ import { exportBackup, importBackup, updateSettings } from '@/lib/db/repo'
 import { LOCALES } from '@/lib/i18n/config'
 import { useLocale } from '@/lib/i18n/useLocale'
 import { useSnackbar } from '@/store/ui'
+import { CompanyBlock } from '@/components/legal/LegalPage'
 
 export default function SettingsPage() {
   const t = useTranslations('common')
@@ -137,6 +139,30 @@ export default function SettingsPage() {
         <p className="m-0">{tLegal('weeklyRest')}</p>
         <p className="m-0">{tLegal('report', { tel: '1350' })}</p>
       </section>
+
+      {/* 약관·방침·문의 */}
+      <p className="mb-[-4px] mt-2 text-[13px] font-semibold text-steel">서비스 정보</p>
+      <nav className="flex flex-col gap-2">
+        {[
+          { href: '/support', label: '문의하기' },
+          { href: '/legal/terms', label: '이용약관' },
+          { href: '/legal/privacy', label: '개인정보 처리방침' },
+          { href: '/legal/data-deletion', label: '데이터 삭제' },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex min-h-14 items-center rounded-lg border border-hairline-soft bg-canvas px-4 text-[15px] font-medium text-ink"
+          >
+            {item.label}
+            <svg className="ml-auto text-stone" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </Link>
+        ))}
+      </nav>
+
+      <CompanyBlock />
     </Screen>
   )
 }

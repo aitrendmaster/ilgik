@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { BottomSheet, StepDots } from '@/components/ui/BottomSheet'
+import { BreakPicker, formatDuration } from './BreakPicker'
 import { Toggle } from '@/components/workplace/WorkplaceSheet'
 import { useSettings, useWorkplaces } from '@/lib/db/hooks'
 import { colorVar, isDarkToken } from '@/lib/db/palette'
@@ -15,7 +16,8 @@ import {
 } from '@/lib/db/repo'
 import type { Workplace } from '@/lib/db/schema'
 import { PayrollInputError, calculateDayPay, type DayPayResult } from '@/lib/payroll'
-import { formatWon, parseDateParts, splitHours } from '@/lib/format'
+import { formatWon, parseDateParts, shiftDays, splitHours } from '@/lib/format'
+import { todayISO } from '@/lib/db/repo'
 import { useLogSheet, useSnackbar, useWorkplaceSheet } from '@/store/ui'
 
 type Mode = 'duration' | 'clock'
@@ -31,13 +33,16 @@ const SEGMENT_LABEL: Record<string, string> = {
 }
 
 export function LogSheet() {
-  const { open, date, editing, close } = useLogSheet()
+  const { open, date: requestedDate, editing, pickDate, close } = useLogSheet()
   const openWorkplaceSheet = useWorkplaceSheet((s) => s.openNew)
   const showSnack = useSnackbar((s) => s.show)
   const workplaces = useWorkplaces()
   const settings = useSettings()
 
   const [step, setStep] = useState(1)
+  // 놓친 날을 나중에 적을 수 있어야 한다. 시트 안에서 날짜를 바꾼다
+  const [date, setDate] = useState<string | null>(null)
+  const [dateOpen, setDateOpen] = useState(false)
   const [workplaceId, setWorkplaceId] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>('duration')
   const [totalMinutes, setTotalMinutes] = useState(480)
@@ -53,6 +58,8 @@ export function LogSheet() {
     if (!open) return
     setConflictIds(null)
     setSaving(false)
+    setDate(requestedDate)
+    setDateOpen(pickDate)
     if (editing) {
       setWorkplaceId(editing.workplaceId)
       setIsHoliday(editing.isHoliday)
@@ -76,7 +83,7 @@ export function LogSheet() {
       setIsHoliday(false)
       setStep(1)
     }
-  }, [open, editing])
+  }, [open, editing, requestedDate, pickDate])
 
   const workplace = useMemo(
     () => workplaces?.find((w) => w.id === workplaceId) ?? null,
@@ -150,6 +157,7 @@ export function LogSheet() {
 
   if (!date) return null
   const d = parseDateParts(date)
+  const isToday = date === todayISO()
 
   return (
     <BottomSheet
@@ -160,8 +168,18 @@ export function LogSheet() {
         <div>
           <div className="flex items-center justify-between gap-3 pt-1.5">
             {step === 1 ? (
-              <h2 id="log-sheet-title" className="text-xl font-medium tracking-[-0.3px]">
-                {d.month}월 {d.day}일 ({d.weekday})
+              <h2 id="log-sheet-title" className="min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setDateOpen((v) => !v)}
+                  aria-expanded={dateOpen}
+                  className="flex items-center gap-1.5 text-xl font-medium tracking-[-0.3px]"
+                >
+                  {d.month}월 {d.day}일 ({d.weekday})
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
               </h2>
             ) : (
               <h2 id="log-sheet-title" className="flex min-w-0 items-center gap-2 text-[17px] font-medium">
@@ -177,10 +195,46 @@ export function LogSheet() {
             <StepDots step={step} />
           </div>
           <p className="m-0 mt-1.5 text-sm text-steel">
-            {step === 1 && '어디서 일했어요?'}
+            {step === 1 && (isToday ? '어디서 일했어요?' : '지난 날을 적고 있어요')}
             {step === 2 && '몇 시간 일했어요?'}
             {step === 3 && `${d.month}월 ${d.day}일 (${d.weekday})`}
           </p>
+
+          {step === 1 && dateOpen && (
+            <div className="mt-2.5 flex flex-col gap-2 rounded-xl bg-surface p-3">
+              <span className="text-[13px] font-medium text-steel">언제 일한 날이에요?</span>
+              <input
+                type="date"
+                value={date}
+                max={todayISO()}
+                onChange={(e) => {
+                  if (e.target.value) setDate(e.target.value)
+                }}
+                className="tnum h-14 rounded-md border border-hairline-strong bg-canvas px-3 text-center text-lg font-medium outline-none focus:border-brand-blue"
+              />
+              <div className="grid grid-cols-3 gap-1.5">
+                {[0, 1, 2].map((back) => {
+                  const iso = shiftDays(todayISO(), -back)
+                  const p = parseDateParts(iso)
+                  return (
+                    <button
+                      key={back}
+                      type="button"
+                      aria-pressed={date === iso}
+                      onClick={() => setDate(iso)}
+                      className={`h-11 rounded-full text-[14px] ${
+                        date === iso
+                          ? 'bg-primary font-semibold text-on-primary'
+                          : 'border border-hairline-strong bg-canvas font-medium'
+                      }`}
+                    >
+                      {back === 0 ? '오늘' : back === 1 ? '어제' : `${p.month}/${p.day}`}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       }
       footer={
@@ -455,8 +509,10 @@ function StepTime(props: {
             </button>
           </div>
 
-          <p className="m-0 text-center text-[13px] text-steel">
-            쉬는 시간 빼고 <strong className="font-semibold">실제로 일한 시간</strong>이에요
+          <p className="m-0 rounded-xl bg-surface px-3.5 py-2.5 text-[13px] leading-relaxed text-steel">
+            쉬는 시간을 <strong className="font-semibold text-ink">빼고</strong> 실제로 일한 시간을 넣어요.
+            {' '}쉬는 시간까지 앱이 빼주길 원하면 위에서{' '}
+            <strong className="font-semibold text-ink">출퇴근 시각</strong>을 골라주세요.
           </p>
         </>
       ) : (
@@ -491,27 +547,7 @@ function StepTime(props: {
             </label>
           </div>
 
-          <div className="grid grid-cols-[72px_1fr_72px] items-center gap-2.5">
-            <button
-              type="button"
-              aria-label="쉬는 시간 30분 빼기"
-              onClick={() => props.setBreakMinutes(Math.max(0, props.breakMinutes - 30))}
-              className="h-14 rounded-full border border-hairline-strong bg-canvas text-lg font-medium"
-            >
-              −30분
-            </button>
-            <span className="tnum text-center text-[15px] font-medium text-slate">
-              쉬는 시간 {props.breakMinutes}분
-            </span>
-            <button
-              type="button"
-              aria-label="쉬는 시간 30분 더하기"
-              onClick={() => props.setBreakMinutes(Math.min(480, props.breakMinutes + 30))}
-              className="h-14 rounded-full border border-hairline-strong bg-canvas text-lg font-medium"
-            >
-              +30분
-            </button>
-          </div>
+          <BreakPicker value={props.breakMinutes} onChange={props.setBreakMinutes} />
         </>
       )}
 

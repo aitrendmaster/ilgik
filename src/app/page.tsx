@@ -18,6 +18,7 @@ export default function HomePage() {
   const workplaces = useWorkplaces()
   const view = useMonthView(month)
   const openLog = useLogSheet((s) => s.openSheet)
+  const openPastLog = useLogSheet((s) => s.openForPastDate)
   const openWorkplace = useWorkplaceSheet((s) => s.openNew)
 
   const [year, m] = month.split('-').map(Number)
@@ -80,6 +81,21 @@ export default function HomePage() {
         </svg>
         {hasWorkplace ? t('cta') : t('emptyWorkplaceCta')}
       </button>
+
+      {/* 놓친 날을 나중에 적을 수 있어야 한다 — 인력사무소 일용직은 며칠씩 밀린다 */}
+      {hasWorkplace && (
+        <button
+          type="button"
+          onClick={() => openPastLog(today)}
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-full border border-hairline-strong bg-canvas text-base font-medium text-ink"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 10h18M8 3v4M16 3v4" />
+          </svg>
+          지난 날 적기
+        </button>
+      )}
 
       {view && recent.length > 0 && (
         <>

@@ -9,7 +9,10 @@ interface LogSheetState {
   date: string | null
   /** 수정 모드일 때 원본 기록 */
   editing: WorkLog | null
+  /** 지난 날짜를 적으러 들어온 경우 날짜 선택기를 펼친 채로 연다 */
+  pickDate: boolean
   openSheet: (date: string, editing?: WorkLog | null) => void
+  openForPastDate: (date: string) => void
   close: () => void
 }
 
@@ -17,8 +20,10 @@ export const useLogSheet = create<LogSheetState>((set) => ({
   open: false,
   date: null,
   editing: null,
-  openSheet: (date, editing = null) => set({ open: true, date, editing }),
-  close: () => set({ open: false, editing: null }),
+  pickDate: false,
+  openSheet: (date, editing = null) => set({ open: true, date, editing, pickDate: false }),
+  openForPastDate: (date) => set({ open: true, date, editing: null, pickDate: true }),
+  close: () => set({ open: false, editing: null, pickDate: false }),
 }))
 
 /** 근무지 만들기·수정 시트 */

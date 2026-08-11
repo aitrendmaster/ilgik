@@ -43,3 +43,11 @@ export function parseDateParts(iso: string): { month: number; day: number; weekd
     weekday: WEEKDAY_KO[date.getUTCDay()] ?? '',
   }
 }
+
+/** "2026-08-12", -1 → "2026-08-11". 로컬 달력 기준으로 옮긴다 */
+export function shiftDays(iso: string, days: number): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y!, (m ?? 1) - 1, (d ?? 1) + days)
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`
+}
