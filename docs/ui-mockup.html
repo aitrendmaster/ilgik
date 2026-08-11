@@ -1,0 +1,1260 @@
+<title>일당노트 — 주요 화면 UI 구성안</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   일당노트 UI 구성안
+   디자인 시스템: DESIGN-ILGIK.md (Miro) 토큰 전면 적용
+   단일 라이트 테마 — DESIGN-ILGIK가 다크 토큰을 정의하지 않음(Known Gaps).
+   모든 색을 명시적으로 칠해 호스트 테마와 무관하게 동일하게 렌더한다.
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  /* ── DESIGN-ILGIK 원본 토큰 ── */
+  --primary:#1c1c1e;      --on-primary:#ffffff;
+  --brand-yellow:#ffd02f; --brand-yellow-deep:#fcb900;
+  --yellow-light:#fff4c4; --yellow-dark:#746019;  --surface-yellow:#fff8e0;
+  --brand-blue:#4262ff;   --blue-450:#5b76fe;     --blue-pressed:#2a41b6;
+  --brand-coral:#ff9999;  --coral-light:#ffc6c6;  --coral-dark:#600000;
+  --brand-rose:#ffd8f4;   --rose-light:#fde0f0;
+  --brand-teal:#0fbcb0;   --teal-light:#c3faf5;   --moss-dark:#187574;
+  --orange-light:#ffe6cd; --brand-red:#fbd4d4;    --brand-red-dark:#e3c5c5;
+  --success:#00b473;
+  --canvas:#ffffff;       --surface:#f7f8fa;      --surface-soft:#fafbfc;
+  --featured:#f5f3ff;
+  --hairline:#e0e2e8;     --hairline-soft:#eef0f3; --hairline-strong:#c7cad5;
+  --ink-deep:#050038;     --ink:#1c1c1e;          --charcoal:#2c2c34;
+  --slate:#555a6a;        --steel:#6b6f7e;        --stone:#8e91a0;  --muted:#a5a8b5;
+  --footer-bg:#1c1c1e;
+
+  /* ── 근무지 스티키 팔레트 8종 (전부 원본 토큰) ── */
+  --wp1:#ffd02f; --wp1t:#1c1c1e;   /* brand-yellow   */
+  --wp2:#ffc6c6; --wp2t:#1c1c1e;   /* coral-light    */
+  --wp3:#c3faf5; --wp3t:#1c1c1e;   /* teal-light     */
+  --wp4:#ffd8f4; --wp4t:#1c1c1e;   /* brand-rose     */
+  --wp5:#ffe6cd; --wp5t:#1c1c1e;   /* orange-light   */
+  --wp6:#4262ff; --wp6t:#ffffff;   /* brand-blue     */
+  --wp7:#0fbcb0; --wp7t:#ffffff;   /* brand-teal     */
+  --wp8:#050038; --wp8t:#ffffff;   /* ink-deep       */
+
+  /* ── radius ── */
+  --r-xs:4px; --r-sm:6px; --r-md:8px; --r-lg:12px;
+  --r-xl:16px; --r-xxl:20px; --r-xxxl:28px; --r-feature:32px; --r-full:9999px;
+
+  /* Roobert PRO는 CSP·라이선스상 로드 불가 + 한글 미지원 → 설치 시에만 사용, 아니면 Pretendard */
+  --font:"Roobert PRO","Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,
+         "Apple SD Gothic Neo","Malgun Gothic","Segoe UI","Noto Sans",system-ui,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+
+  --sh-card:rgba(5,0,56,.06) 0 4px 12px 0;
+  --sh-mock:rgba(5,0,56,.08) 0 12px 32px -4px;
+  --sh-modal:rgba(5,0,56,.12) 0 16px 48px -8px;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--canvas);color:var(--ink);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.5;
+}
+:focus-visible{outline:2px solid var(--brand-blue);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* ═══════════ PAGE CHROME ═══════════ */
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px 96px}
+
+.topbar{
+  display:flex;align-items:center;gap:16px;height:64px;border-bottom:1px solid var(--hairline-soft)
+}
+.mark{
+  display:inline-flex;align-items:center;gap:10px;font-size:16px;font-weight:500;letter-spacing:-.2px
+}
+.mark i{
+  width:28px;height:28px;border-radius:var(--r-sm);background:var(--brand-yellow);
+  display:grid;place-items:center;font-size:15px;font-weight:600;font-style:normal;color:var(--ink)
+}
+.topbar .sp{flex:1}
+.topbar .meta{font-size:13px;color:var(--steel)}
+
+.hero{padding:96px 0 64px;max-width:960px}
+.eyebrow{
+  display:inline-block;background:var(--surface-yellow);color:var(--yellow-dark);
+  font-size:13px;font-weight:600;line-height:1.4;border-radius:var(--r-full);padding:4px 10px;margin:0 0 24px
+}
+.hero h1{
+  margin:0;font-size:clamp(40px,6.4vw,80px);font-weight:500;line-height:1.05;letter-spacing:-2px;
+  text-wrap:balance
+}
+.hero h1 span{color:var(--stone)}
+.hero p{margin:24px 0 0;font-size:18px;font-weight:400;line-height:1.5;color:var(--slate);max-width:62ch}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px}
+.pills span{
+  border:1px solid var(--hairline);border-radius:var(--r-full);padding:8px 16px;
+  font-size:14px;font-weight:500;color:var(--slate)
+}
+
+/* token strip */
+.tokens{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:40px
+}
+.tok{border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:14px 16px}
+.tok .sw{height:32px;border-radius:var(--r-md);margin-bottom:10px;border:1px solid var(--hairline-soft)}
+.tok .nm{font-size:14px;font-weight:500;line-height:1.5}
+.tok .hx{font-family:var(--mono);font-size:12px;color:var(--steel);margin-top:2px}
+
+/* section */
+.sect{padding:96px 0;border-top:1px solid var(--hairline-soft)}
+.sect-grid{display:grid;grid-template-columns:375px minmax(0,1fr);gap:64px;align-items:start}
+@media (max-width:960px){
+  .sect-grid{grid-template-columns:minmax(0,1fr);gap:40px;justify-items:center}
+  .notes{width:100%;max-width:620px}
+  .wrap{padding:0 20px 64px}
+  .sect{padding:64px 0}
+}
+.route{
+  display:inline-block;background:var(--featured);color:var(--brand-blue);
+  font-size:13px;font-weight:600;border-radius:var(--r-full);padding:4px 10px;
+  font-family:var(--mono);margin:0 0 16px
+}
+.route.new{background:var(--coral-light);color:var(--coral-dark)}
+.sect h2{margin:0;font-size:36px;font-weight:500;line-height:1.2;letter-spacing:-.5px}
+.sect .lede{margin:16px 0 40px;font-size:18px;font-weight:400;line-height:1.5;color:var(--slate);max-width:64ch}
+
+/* notes */
+.notes{display:flex;flex-direction:column;gap:24px}
+.card{border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:24px}
+.card.pastel-y{background:var(--surface-yellow);border-color:transparent}
+.card.pastel-c{background:var(--coral-light);border-color:transparent}
+.card.pastel-t{background:var(--teal-light);border-color:transparent}
+.card.dark{background:var(--primary);color:var(--on-primary);border-color:transparent}
+.card.dark .k{color:var(--stone)}
+.card h3{
+  margin:0 0 16px;font-size:18px;font-weight:500;line-height:1.4
+}
+.card h3 .tag{
+  font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  background:var(--canvas);color:var(--coral-dark);border-radius:var(--r-full);
+  padding:3px 9px;margin-left:8px;vertical-align:2px
+}
+dl.spec{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 20px;font-size:14px}
+dl.spec dt{font-family:var(--mono);font-size:12.5px;color:var(--steel);white-space:nowrap;padding-top:2px}
+.card.dark dl.spec dt{color:var(--muted)}
+dl.spec dd{margin:0;line-height:1.5}
+dl.spec dd b{font-weight:600}
+.notes ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5}
+.notes li strong{font-weight:600}
+.notes p{margin:0;font-size:14px;line-height:1.5}
+.notes p + p{margin-top:10px}
+code{
+  font-family:var(--mono);font-size:.86em;background:var(--surface);
+  border:1px solid var(--hairline-soft);border-radius:var(--r-xs);padding:1px 5px
+}
+.card.dark code{background:#2c2c34;border-color:#3a3a44;color:#fff}
+.card.pastel-c code,.card.pastel-y code,.card.pastel-t code{background:rgba(255,255,255,.65);border-color:transparent}
+
+/* ═══════════ PHONE ═══════════ */
+.phone{
+  width:375px;flex:none;border-radius:var(--r-feature);background:var(--canvas);
+  border:1px solid var(--hairline);box-shadow:var(--sh-mock);padding:8px;position:sticky;top:24px
+}
+@media (max-width:960px){.phone{position:static}}
+.vp{
+  width:357px;height:744px;border-radius:24px;overflow:hidden;background:var(--surface);
+  position:relative;display:flex;flex-direction:column;color:var(--ink);line-height:1.45
+}
+.vp.tall{height:796px}
+
+.sbar{
+  height:32px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums
+}
+.sbar i{display:block;width:16px;height:9px;border:1.4px solid currentColor;border-radius:2.5px;opacity:.6}
+
+.abar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 12px 12px;gap:8px}
+.abar-t{font-size:22px;font-weight:500;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;padding-left:6px}
+.ibtn{
+  width:40px;height:40px;border-radius:var(--r-full);border:1px solid var(--hairline);
+  background:var(--canvas);color:var(--ink);display:grid;place-items:center;flex:none
+}
+.ibtn.bare{border-color:transparent;background:transparent}
+
+.body{flex:1;overflow:hidden;padding:0 16px 12px;display:flex;flex-direction:column;gap:12px}
+
+.tabs{
+  flex:none;height:64px;border-top:1px solid var(--hairline-soft);background:var(--canvas);
+  display:grid;grid-template-columns:repeat(4,1fr)
+}
+.tab{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:11px;font-weight:500;color:var(--stone);background:none;border:0;font-family:inherit
+}
+.tab[aria-current="page"]{color:var(--ink);font-weight:600}
+
+/* ── 정산 카드 (시그니처) ─────────────────
+   봉투 은유는 유지하되 Miro 규칙에 맞춰 flat + hairline.
+   노이즈 텍스처·도장 스탬프 제거, 절취선은 1px dashed 한 줄로 절제. */
+.env{
+  background:var(--canvas);border-radius:var(--r-xxxl);border:1px solid var(--hairline-soft);
+  padding:20px;position:relative
+}
+.env.pale{background:var(--surface-yellow);border-color:transparent}
+.env-k{font-size:14px;font-weight:500;color:var(--steel);margin:0}
+.money{
+  font-size:48px;font-weight:500;letter-spacing:-1.5px;line-height:1.1;color:var(--success);
+  font-variant-numeric:tabular-nums;margin:4px 0 0
+}
+.money small{font-size:22px;letter-spacing:0}
+.est{
+  position:absolute;top:18px;right:18px;background:var(--coral-light);color:var(--coral-dark);
+  font-size:13px;font-weight:600;line-height:1.4;border-radius:var(--r-full);padding:4px 10px
+}
+.tear{border-top:1px dashed var(--hairline-strong);margin:16px -20px 14px}
+.kv{display:flex;justify-content:space-between;font-size:14px;color:var(--slate);font-variant-numeric:tabular-nums}
+.kv + .kv{margin-top:6px}
+.kv b{font-weight:500;color:var(--ink)}
+.kv b.neg{color:var(--coral-dark)}
+
+/* ── buttons ── */
+.btn{
+  height:64px;width:100%;border:0;border-radius:var(--r-full);background:var(--primary);
+  color:var(--on-primary);font-family:inherit;font-size:18px;font-weight:500;
+  display:flex;align-items:center;justify-content:center;gap:8px
+}
+.btn.sec{
+  background:transparent;color:var(--ink);border:1px solid var(--hairline-strong);height:56px;font-size:16px
+}
+.btn.dis{background:var(--hairline);color:var(--muted)}
+.btn.ok{background:transparent;border:1px solid var(--success);color:var(--success);height:56px;font-size:16px;font-weight:500}
+.btn.sm{height:56px;font-size:16px}
+
+.warnbar{
+  display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:0 18px 0 16px;
+  border-radius:var(--r-full);background:var(--coral-light);color:var(--coral-dark);
+  font-size:15px;font-weight:500;font-family:inherit;border:0;text-align:left
+}
+.warnbar b{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;margin-left:auto}
+
+.lbl{font-size:13px;font-weight:600;color:var(--steel);margin:4px 0 -4px}
+
+/* ── rows ── */
+.list{display:flex;flex-direction:column;gap:8px}
+.row{
+  display:flex;align-items:center;gap:12px;background:var(--canvas);
+  border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:11px 14px;min-height:60px
+}
+.sq{width:14px;height:14px;border-radius:var(--r-xs);flex:none;border:1px solid rgba(5,0,56,.09)}
+.row-m{flex:1;min-width:0}
+.row-t{font-size:15px;font-weight:500;line-height:1.3;display:flex;align-items:center;gap:6px}
+.row-s{font-size:13px;font-weight:400;color:var(--steel);font-variant-numeric:tabular-nums;line-height:1.4}
+.row-a{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.chip{
+  font-size:12px;font-weight:600;line-height:1.4;border-radius:var(--r-full);padding:2px 8px;flex:none
+}
+.chip.coral{background:var(--coral-light);color:var(--coral-dark)}
+.chip.yellow{background:var(--surface-yellow);color:var(--yellow-dark)}
+.chip.blue{background:var(--featured);color:var(--brand-blue)}
+.chip.teal{background:var(--teal-light);color:var(--moss-dark)}
+
+/* ── language ── */
+.lang{
+  display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:0 20px;
+  background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-full);
+  font-family:inherit;font-size:20px;font-weight:500;color:var(--ink);text-align:left
+}
+.lang .fl{font-size:28px;line-height:1;flex:none}
+.lang.pick{border:2px solid var(--brand-blue);background:var(--featured)}
+.lang .tk{margin-left:auto;color:var(--brand-blue);flex:none}
+
+/* ── sticky note (근무지) ── */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sticky{
+  border-radius:var(--r-xxl);padding:14px;border:0;text-align:left;font-family:inherit;
+  min-height:112px;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:var(--sh-card)
+}
+.sticky.wide{grid-column:1/-1;min-height:88px;flex-direction:row;align-items:center;gap:14px}
+.sticky .emo{font-size:30px;line-height:1}
+.sticky .nm{font-size:17px;font-weight:500;letter-spacing:-.2px;display:block}
+.sticky .wg{font-size:13px;font-weight:400;opacity:.78;font-variant-numeric:tabular-nums;display:block;margin-top:1px}
+.sticky .rc{
+  font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  background:rgba(255,255,255,.5);border-radius:var(--r-full);padding:3px 9px;align-self:flex-start
+}
+.sticky.add{
+  background:transparent;border:1px dashed var(--hairline-strong);color:var(--steel);box-shadow:none;
+  align-items:center;justify-content:center;font-size:15px;font-weight:500;gap:6px;flex-direction:column
+}
+
+/* ── sheet ── */
+.scrim{flex:1;background:rgba(5,0,56,.4)}
+.sheet{
+  background:var(--canvas);border-radius:var(--r-feature) var(--r-feature) 0 0;margin-top:auto;
+  display:flex;flex-direction:column;box-shadow:var(--sh-modal)
+}
+.grab{width:40px;height:4px;border-radius:var(--r-full);background:var(--hairline-strong);margin:10px auto 4px}
+.sh-h{padding:6px 20px 14px;border-bottom:1px solid var(--hairline-soft)}
+.sh-b{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.sh-f{padding:14px 20px 22px;border-top:1px solid var(--hairline-soft)}
+.steps{display:flex;gap:5px}
+.steps i{width:24px;height:4px;border-radius:var(--r-full);background:var(--hairline);display:block}
+.steps i.on{background:var(--primary)}
+
+/* ── segmented / presets ── */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border-radius:var(--r-full);padding:4px}
+.seg button{
+  height:48px;border:0;border-radius:var(--r-full);background:transparent;font-family:inherit;
+  font-size:15px;font-weight:500;color:var(--steel)
+}
+.seg button[aria-selected="true"]{background:var(--canvas);color:var(--ink);font-weight:600;box-shadow:var(--sh-card)}
+
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.preset{
+  height:72px;border-radius:var(--r-full);border:1px solid var(--hairline-strong);background:var(--canvas);
+  font-family:inherit;font-size:22px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums
+}
+.preset[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.nudge{display:grid;grid-template-columns:72px 1fr 72px;gap:10px;align-items:center}
+.nudge button{
+  height:56px;border-radius:var(--r-full);border:1px solid var(--hairline-strong);background:var(--canvas);
+  font-family:inherit;font-size:18px;font-weight:500;color:var(--ink)
+}
+.nudge .v{text-align:center;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.hint{font-size:13px;font-weight:400;color:var(--steel);text-align:center;margin:-4px 0 0}
+
+.trow{
+  display:flex;align-items:center;gap:12px;min-height:60px;padding:0 18px;
+  border:1px solid var(--hairline);border-radius:var(--r-full);background:var(--canvas);
+  font-weight:500;font-size:15px
+}
+.trow.on{background:var(--coral-light);border-color:transparent;color:var(--coral-dark)}
+.sw{width:52px;height:32px;border-radius:var(--r-full);background:var(--hairline-strong);position:relative;flex:none;margin-left:auto}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(5,0,56,.25)}
+.sw.on{background:var(--coral-dark)}
+.sw.on::after{left:23px}
+
+/* ── breakdown ── */
+.bd{display:flex;flex-direction:column;gap:8px}
+.bd-r{display:flex;justify-content:space-between;font-size:14px;color:var(--slate);font-variant-numeric:tabular-nums}
+.bd-r b{color:var(--ink);font-weight:500}
+.mx{
+  font-family:var(--mono);font-size:11px;font-weight:600;background:var(--surface);
+  border-radius:var(--r-full);padding:2px 7px;margin-left:6px;color:var(--slate)
+}
+
+/* ── calendar ── */
+.calbar{
+  display:flex;gap:8px;background:var(--canvas);border:1px solid var(--hairline-soft);
+  border-radius:var(--r-xl);padding:12px 16px
+}
+.calbar div{flex:1;font-size:12px;font-weight:500;color:var(--steel)}
+.calbar b{display:block;font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.4px;margin-top:1px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .dw{text-align:center;font-size:11px;font-weight:600;color:var(--stone);padding:4px 0}
+.cal .dw.s{color:var(--coral-dark)}
+.cell{
+  min-height:58px;border-radius:var(--r-md);background:var(--canvas);border:1px solid transparent;
+  display:flex;flex-direction:column;align-items:center;padding-top:5px;gap:3px
+}
+.cell.e{background:transparent}
+.cell .d{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.cell .dd{display:flex;gap:2px}
+.cell .dd i{width:9px;height:9px;border-radius:2.5px;display:block;border:1px solid rgba(5,0,56,.08)}
+.cell .h{font-size:10.5px;font-weight:500;color:var(--steel);font-variant-numeric:tabular-nums}
+.cell.today{border-color:var(--primary)}
+.cell.hol{background:var(--coral-light)}
+.cell.off{background:transparent;color:var(--muted)}
+
+/* ── summary ── */
+.subs{margin-top:4px}
+.sub-r{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--hairline-soft)}
+.sub-r .nm{font-size:14px;font-weight:500;flex:1}
+.sub-r .hh{font-size:13px;color:var(--steel);font-variant-numeric:tabular-nums}
+.sub-r .am{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.disc{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;font-size:14px;font-weight:500;color:var(--slate)}
+.info{
+  background:var(--surface);border-radius:var(--r-xl);padding:16px;font-size:13px;
+  color:var(--slate);display:flex;flex-direction:column;gap:10px;line-height:1.45
+}
+.info div{display:flex;gap:9px}
+.info svg{flex:none;margin-top:2px;color:var(--stone)}
+.info .tel{color:var(--ink);font-weight:600}
+
+/* ── unpaid ── */
+.bigwarn{background:var(--coral-light);border-radius:var(--r-xxxl);padding:20px}
+.bigwarn .k{font-size:14px;font-weight:500;color:var(--coral-dark)}
+.bigwarn .v{
+  font-size:48px;font-weight:500;color:var(--coral-dark);letter-spacing:-1.5px;
+  font-variant-numeric:tabular-nums;line-height:1.1;margin-top:2px
+}
+.bigwarn .v small{font-size:22px;letter-spacing:0}
+.upc{background:var(--canvas);border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:16px}
+.upc-t{display:flex;align-items:center;gap:10px}
+.upc-t .nm{font-size:16px;font-weight:500;flex:1}
+.upc-t .am{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.due{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;font-weight:600;border-radius:var(--r-full);padding:4px 10px}
+.due.w{background:var(--surface);color:var(--slate)}
+.due.l{background:var(--coral-light);color:var(--coral-dark)}
+.helpbtn{
+  width:100%;min-height:72px;border-radius:var(--r-xxxl);border:0;background:var(--primary);
+  color:var(--on-primary);font-family:inherit;font-size:16px;font-weight:500;display:flex;
+  align-items:center;gap:14px;padding:0 20px;text-align:left
+}
+.helpbtn .ar{margin-left:auto}
+
+/* ── form ── */
+.fld{display:flex;flex-direction:column;gap:8px}
+.fld > label{font-size:13px;font-weight:600;color:var(--steel)}
+.inp{
+  height:56px;border:1px solid var(--hairline-strong);border-radius:var(--r-md);background:var(--canvas);
+  display:flex;align-items:center;padding:0 16px;font-size:17px;font-weight:500;font-variant-numeric:tabular-nums
+}
+.inp .u{margin-left:auto;color:var(--steel);font-size:14px;font-weight:400}
+.rad{
+  display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 16px;
+  border:1px solid var(--hairline);border-radius:var(--r-xl);background:var(--canvas)
+}
+.rad.on{border:2px solid var(--brand-blue);background:var(--featured);padding:11px 15px}
+.rad .rr{width:22px;height:22px;border-radius:50%;border:1px solid var(--hairline-strong);flex:none;background:#fff}
+.rad.on .rr{border:7px solid var(--brand-blue)}
+.rad .tt{font-size:16px;font-weight:500;line-height:1.3;display:block}
+.rad .ss{font-size:13px;color:var(--steel);line-height:1.4;display:block;margin-top:2px}
+.chks{display:flex;flex-direction:column;gap:6px;padding:14px;background:var(--surface);border-radius:var(--r-xl)}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px;font-weight:500}
+.chk .bx{width:24px;height:24px;border-radius:var(--r-sm);border:1px solid var(--hairline-strong);background:#fff;flex:none;display:grid;place-items:center}
+.chk.on .bx{background:var(--primary);border-color:var(--primary);color:#fff}
+.rateout{
+  margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--yellow-dark);
+  background:var(--surface-yellow);border-radius:var(--r-full);padding:3px 10px
+}
+.swr{display:flex;gap:8px;flex-wrap:wrap}
+.swr i{width:34px;height:34px;border-radius:var(--r-md);display:block;border:1px solid rgba(5,0,56,.08)}
+.swr i.sel{outline:2px solid var(--primary);outline-offset:2px}
+
+/* snackbar */
+.snack{
+  position:absolute;left:16px;right:16px;bottom:16px;background:var(--primary);color:var(--on-primary);
+  border-radius:var(--r-full);min-height:56px;display:flex;align-items:center;gap:12px;padding:0 12px 0 20px;
+  font-size:14px;font-weight:400;box-shadow:var(--sh-modal)
+}
+.snack button{
+  margin-left:auto;background:var(--canvas);border:0;color:var(--primary);font-family:inherit;
+  font-size:14px;font-weight:500;padding:9px 18px;border-radius:var(--r-full)
+}
+
+/* footer */
+.foot{background:var(--footer-bg);color:var(--on-primary);border-radius:var(--r-feature);padding:64px 32px;margin-top:32px}
+.foot h3{margin:0 0 12px;font-size:28px;font-weight:500;line-height:1.25;letter-spacing:-.5px}
+.foot p{margin:0 0 8px;font-size:14px;color:var(--muted);max-width:72ch;line-height:1.5}
+.foot code{background:#2c2c34;border-color:#3a3a44;color:#fff}
+</style>
+
+<div class="wrap">
+
+<div class="topbar">
+  <span class="mark"><i>일</i>일당노트</span>
+  <span class="sp"></span>
+  <span class="meta">UI 구성안 v1 · DESIGN-ILGIK 적용</span>
+</div>
+
+<header class="hero">
+  <p class="eyebrow">기획서 v1.0 기준 · 주요 화면 9종</p>
+  <h1>글자를 못 읽어도<br><span>3번 눌러서 끝난다</span></h1>
+  <p>외국인 근로자용 근무기록·급여계산 앱의 화면 구성안입니다. 아래 화면은 <code>DESIGN-ILGIK.md</code>의 토큰·컴포넌트 규칙으로 실제 렌더한 것이라, 색·치수·radius를 그대로 구현 기준으로 쓸 수 있습니다.</p>
+  <div class="pills">
+    <span>375 × 812</span><span>black pill CTA</span><span>rounded.full</span>
+    <span>터치 타깃 ≥ 56px</span><span>weight 400/500/600</span><span>flat + hairline</span>
+  </div>
+
+  <div class="tokens">
+    <div class="tok"><div class="sw" style="background:#1c1c1e"></div><div class="nm">primary</div><div class="hx">#1c1c1e · 주 CTA·본문</div></div>
+    <div class="tok"><div class="sw" style="background:#ffd02f"></div><div class="nm">brand-yellow</div><div class="hx">#ffd02f · 로고·태그만</div></div>
+    <div class="tok"><div class="sw" style="background:#00b473"></div><div class="nm">success-accent</div><div class="hx">#00b473 · 실수령</div></div>
+    <div class="tok"><div class="sw" style="background:#ffc6c6"></div><div class="nm">coral-light</div><div class="hx">#ffc6c6 · 미지급 지면</div></div>
+    <div class="tok"><div class="sw" style="background:#600000"></div><div class="nm">coral-dark</div><div class="hx">#600000 · 미지급 글자</div></div>
+    <div class="tok"><div class="sw" style="background:#4262ff"></div><div class="nm">brand-blue</div><div class="hx">#4262ff · 선택 상태</div></div>
+    <div class="tok"><div class="sw" style="background:#f7f8fa"></div><div class="nm">surface</div><div class="hx">#f7f8fa · 앱 배경</div></div>
+    <div class="tok"><div class="sw" style="background:#eef0f3"></div><div class="nm">hairline-soft</div><div class="hx">#eef0f3 · 카드 테두리</div></div>
+  </div>
+</header>
+
+<!-- ═══════════ 0. 시스템 매핑 ═══════════ -->
+<section class="sect">
+  <p class="route new">DESIGN-ILGIK 적용 결정</p>
+  <h2>시스템 매핑 — 무엇을 바꿨나</h2>
+  <p class="lede">기획서의 색 방향(작업복 인디고 <code>#16233A</code> + 안전조끼 노랑 CTA)과 DESIGN-ILGIK가 충돌합니다. Miro 시스템이 우선하므로 아래와 같이 재배치했습니다.</p>
+
+  <div class="notes" style="max-width:none">
+    <div class="card">
+      <h3>토큰 재배치</h3>
+      <dl class="spec">
+        <dt>주 CTA</dt><dd>안전조끼 노랑 → <b>black pill <code>#1c1c1e</code> + <code>rounded.full</code></b>. DESIGN-ILGIK는 노랑을 CTA에 쓰는 것을 금지합니다. 흰 배경 위 검정은 대비 21:1로 오히려 시인성이 더 좋습니다</dd>
+        <dt>브랜드 노랑</dt><dd><code>#ffd02f</code>는 <b>로고 마크·태그 칩</b>에만. 앱 안에서는 공제율 배지 정도로 절제</dd>
+        <dt>실수령</dt><dd><code>--money #0E9F6E</code> → <b><code>success-accent #00b473</code></b></dd>
+        <dt>미지급·경고</dt><dd><code>--alert #E8590C</code> → <b><code>coral-light</code> 지면 + <code>coral-dark #600000</code> 글자</b> (<code>badge-tag-coral</code> 규격)</dd>
+        <dt>선택 상태</dt><dd>ink 반전 유지 + 폼 선택은 <b><code>brand-blue</code> 2px 테두리 + <code>featured</code> 배경</b> (<code>pricing-card-featured</code> 규격)</dd>
+        <dt>굵기</dt><dd>800 → <b>400 / 500 / 600만</b>. Miro는 700을 쓰지 않습니다. 위계는 <b>크기와 색</b>으로 만듭니다</dd>
+      </dl>
+    </div>
+
+    <div class="card pastel-c">
+      <h3>은유 전환 — 급여봉투 → 스티키 노트 <span class="tag">중요</span></h3>
+      <p>기획서의 시그니처는 <strong>급여봉투 카드</strong>(톱니 절취선 + 종이 노이즈 + 도장 스탬프)였습니다. 이는 DESIGN-ILGIK의 <code>flat + hairline</code> 원칙, "무거운 그림자 금지", 파스텔 카드 규격과 정면으로 충돌합니다.</p>
+      <p>→ <strong>근무지를 스티키 노트로 재정의</strong>했습니다. Miro의 파스텔 피처 카드는 원래 화이트보드 스티키 팔레트에서 온 것이고, "오늘 어디서 일했는지 붙여두는 메모"라는 제품 행위와 정확히 겹칩니다. 봉투는 월 1회 순간이지만 스티키는 <strong>매일의 기록 행위</strong>와 맞습니다.</p>
+      <p>정산 카드는 <code>rounded.xxxl</code> 파스텔 카드로 남기고, 절취선은 <code>1px dashed</code> 한 줄로만 흔적을 남깁니다. 노이즈 텍스처와 도장 스탬프는 제거하고, "예상" 고지는 <code>badge-tag-coral</code> pill로 대체했습니다.</p>
+    </div>
+
+    <div class="card pastel-y">
+      <h3>근무지 스티키 팔레트 8종</h3>
+      <p style="margin-bottom:14px">DESIGN-ILGIK의 파스텔은 서로 너무 가까워(<code>coral-light</code> / <code>brand-red</code> / <code>orange-light</code>) 8개를 구분할 수 없습니다. 문서 Known Gaps의 "실제 화이트보드 스티키는 마케팅 지면보다 진하다"를 근거로 <strong>파스텔 5 + 진한 3</strong>으로 구성해 명도까지 갈랐습니다. 색맹 대응은 이모지 병행으로 보강합니다.</p>
+      <div class="swr">
+        <i style="background:#ffd02f"></i><i style="background:#ffc6c6"></i><i style="background:#c3faf5"></i>
+        <i style="background:#ffd8f4"></i><i style="background:#ffe6cd"></i>
+        <i style="background:#4262ff"></i><i style="background:#0fbcb0"></i><i style="background:#050038"></i>
+      </div>
+      <dl class="spec" style="margin-top:16px">
+        <dt>파스텔 5</dt><dd>brand-yellow · coral-light · teal-light · brand-rose · orange-light — 글자 <code>#1c1c1e</code></dd>
+        <dt>진한 3</dt><dd>brand-blue · brand-teal · ink-deep — 글자 <code>#ffffff</code></dd>
+      </dl>
+    </div>
+
+    <div class="card dark">
+      <h3>지키지 않은 규칙 2개 (의도적)</h3>
+      <dl class="spec">
+        <dt>터치 타깃</dt><dd>DESIGN-ILGIK는 pill 버튼을 40~44px로 정의합니다. 이 앱은 <b>56px(주 CTA 64px)</b>로 올립니다. 저문해·현장 장갑 사용자가 대상이라 제품 요구가 우선합니다. <b>형태(pill·radius·색)는 그대로 따릅니다</b></dd>
+        <dt>Roobert PRO</dt><dd>한글 글리프가 없고 CDN 로드도 막혀 있습니다. <code>font-family</code>에 1순위로 두되 실제 렌더는 <b>Pretendard</b>가 담당합니다. Roobert의 기하학적 성격과 가장 가까운 한글 face입니다</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 1. 언어 선택 ═══════════ -->
+<section class="sect">
+  <p class="route">/welcome · 온보딩 1/3</p>
+  <h2>언어 선택</h2>
+  <p class="lede">앱 전체에서 <strong>한국어가 단 한 글자도 없는 유일한 화면</strong>입니다. "언어를 선택하세요"라고 쓰면 그걸 못 읽는 사람이 대상입니다. 국기와 자국어 표기만으로 완결시킵니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="body" style="gap:10px;padding-top:4px">
+        <div style="display:grid;place-items:center;padding:20px 0 22px">
+          <span style="width:56px;height:56px;border-radius:12px;background:var(--brand-yellow);display:grid;place-items:center;font-size:26px;font-weight:600">일</span>
+        </div>
+        <button class="lang pick"><span class="fl">🇻🇳</span>Tiếng Việt
+          <svg class="tk" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        </button>
+        <button class="lang"><span class="fl">🇰🇭</span>ភាសាខ្មែរ</button>
+        <button class="lang"><span class="fl">🇳🇵</span>नेपाली</button>
+        <button class="lang"><span class="fl">🇮🇩</span>Bahasa Indonesia</button>
+        <button class="lang"><span class="fl">🇬🇧</span>English</button>
+        <button class="lang"><span class="fl">🇰🇷</span>한국어</button>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>구성</h3>
+        <dl class="spec">
+          <dt>행</dt><dd>높이 <b>68px</b> · <code>rounded.full</code> · <code>hairline</code> 1px. 첫 화면 실패율이 전체 이탈을 좌우하므로 기준(56px)보다 크게</dd>
+          <dt>추정 언어</dt><dd><code>navigator.language</code> 매칭 → 맨 위 + <b><code>brand-blue</code> 2px + <code>featured</code> 배경</b> (<code>pricing-card-featured</code> 규격 차용)</dd>
+          <dt>로고</dt><dd>56px <code>brand-yellow</code> 스퀘어. 앱 안에서 노랑을 크게 쓰는 <b>유일한 자리</b></dd>
+          <dt>텍스트</dt><dd>20px / 500. 자국어 표기 하나만. 영문 병기 없음</dd>
+          <dt>Phase 1</dt><dd>ko · en · vi · km · ne · id (6개)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>동작</h3>
+        <ul>
+          <li>탭 즉시 다음 스텝. <strong>확인 버튼 없음</strong></li>
+          <li><code>settings.locale</code> 저장 → 선택 언어 폰트만 동적 로드</li>
+          <li>미검수 언어는 우측에 <code>badge-tag-yellow</code> "검수중" + 영문 병기</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>이어지는 2·3스텝</h3>
+        <ul>
+          <li><strong>2/3 법적 고지</strong> — 아이콘 3컷(계산기·서류·전화) + <code>button-primary</code> 확인. <code>legalNoticeAcceptedAt</code> 기록. 스킵 불가</li>
+          <li><strong>3/3 첫 근무지</strong> — 이름만 입력. 시급 10,320 프리필, 색·이모지 자동 배정. 튜토리얼 슬라이드 없음</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2. 홈 ═══════════ -->
+<section class="sect">
+  <p class="route">/ · 홈</p>
+  <h2>홈 (오늘)</h2>
+  <p class="lede">위에서 아래로 <strong>받을 돈 → 못 받은 돈 → 기록하기 → 최근 기록</strong>. 앱을 여는 이유를 먼저 보여주고, 앱을 계속 쓰는 이유를 그 바로 아래 둡니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="abar">
+        <div class="abar-t">2026년 8월
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <button class="ibtn" aria-label="설정">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        </button>
+      </div>
+      <div class="body">
+        <div class="env">
+          <p class="env-k">이번 달 받을 돈</p>
+          <p class="money">2,230,291<small>원</small></p>
+          <div class="tear"></div>
+          <div class="kv"><span>세전 합계</span><b>2,314,120원</b></div>
+          <div class="kv"><span>공제</span><b class="neg">−83,829원</b></div>
+        </div>
+
+        <button class="warnbar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg>
+          아직 못 받은 돈 <b>1,217,800</b>
+        </button>
+
+        <button class="btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          오늘 기록하기
+        </button>
+
+        <p class="lbl">최근 기록</p>
+        <div class="list">
+          <div class="row"><span class="sq" style="background:var(--wp6)"></span>
+            <div class="row-m"><div class="row-t">🏭 삼성전기</div><div class="row-s">8/25 화 · 8시간</div></div>
+            <div class="row-a">96,000</div></div>
+          <div class="row"><span class="sq" style="background:var(--wp1)"></span>
+            <div class="row-m"><div class="row-t">🔩 한국공업 <span class="chip coral">미지급</span></div><div class="row-s">8/24 월 · 12시간</div></div>
+            <div class="row-a">161,000</div></div>
+          <div class="row"><span class="sq" style="background:var(--wp3)"></span>
+            <div class="row-m"><div class="row-t">🚚 대성물류</div><div class="row-s">8/22 토 · 8시간</div></div>
+            <div class="row-a">82,560</div></div>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 21V8l6-4 6 4v13M15 21V11h6v10M3 21h18"/></svg>근무지</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>설정</button>
+      </nav>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>위계</h3>
+        <dl class="spec">
+          <dt>실수령</dt><dd><b>48px / 500 / <code>success-accent</code></b> · <code>letter-spacing -1.5px</code> — <code>stat-display</code> 규격</dd>
+          <dt>세전·공제</dt><dd>14px / <code>slate</code>. 절취선(<code>1px dashed hairline-strong</code>) 아래 key-value 2줄</dd>
+          <dt>주 CTA</dt><dd><b>64px 전폭 black pill</b>. 화면에서 유일한 검정 면</dd>
+          <dt>미수금</dt><dd>56px <code>coral-light</code> pill + <code>coral-dark</code> 글자. <b>0원이면 렌더하지 않음</b></dd>
+          <dt>정산 카드</dt><dd><code>rounded.xxxl</code> 28px · <code>hairline-soft</code> 1px · <b>그림자 없음</b> (flat 원칙)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>결정 근거</h3>
+        <ul>
+          <li><strong>미수금을 CTA 위에 둔 이유</strong> — 아래면 스크롤 밖으로 밀립니다. 이 앱이 계산기와 갈라지는 지점이라 첫 화면에 있어야 합니다</li>
+          <li><strong>월 선택을 헤더에</strong> — 지난달 정산을 자주 봅니다. 탭을 하나 더 넣으면 안 됩니다</li>
+          <li>모든 금액에 <code>font-variant-numeric: tabular-nums</code> 필수. 세로로 정렬된 숫자가 흔들리면 신뢰가 깨집니다</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>상태</h3>
+        <dl class="spec">
+          <dt>근무지 0</dt><dd>정산 카드 대신 안내. CTA를 "근무지 만들기"로 교체</dd>
+          <dt>기록 0</dt><dd>정산 카드 0원 + "오늘 일했으면 눌러주세요"</dd>
+          <dt>미수금 0</dt><dd>pill 미표시. 빈 자리를 남기지 않고 레이아웃이 위로 붙음</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 3. Step 1 ═══════════ -->
+<section class="sect">
+  <p class="route">/log/new · Step 1 / 3</p>
+  <h2>기록 입력 ① 근무지</h2>
+  <p class="lede">앱의 심장입니다. 근무지 카드는 <strong>스티키 노트</strong>로 렌더합니다 — Miro 파스텔이 원래 스티키 팔레트에서 왔고, "오늘 어디서 일했는지 붙여둔다"는 제품 행위와 정확히 겹칩니다. 카드를 <strong>탭하는 순간 Step 2로</strong> 넘어갑니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="scrim"></div>
+      <div class="sheet" style="flex:none;height:612px">
+        <div class="grab"></div>
+        <div class="sh-h">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px">
+            <div style="font-size:20px;font-weight:500;letter-spacing:-.3px">8월 26일 (수)</div>
+            <div class="steps"><i class="on"></i><i></i><i></i></div>
+          </div>
+          <p style="margin:6px 0 0;font-size:14px;color:var(--steel)">어디서 일했어요?</p>
+        </div>
+        <div class="sh-b">
+          <div class="notes-grid">
+            <button class="sticky wide" style="background:var(--wp6);color:var(--wp6t)">
+              <span class="emo" style="font-size:36px">🏭</span>
+              <span style="flex:1"><span class="nm" style="font-size:19px">삼성전기</span><span class="wg">12,000원 · 3.3%</span></span>
+              <span class="rc" style="background:rgba(255,255,255,.22);color:#fff">최근</span>
+            </button>
+            <button class="sticky" style="background:var(--wp1);color:var(--wp1t)">
+              <span class="emo">🔩</span>
+              <span><span class="nm">한국공업</span><span class="wg">11,500원 · 4대보험</span></span>
+            </button>
+            <button class="sticky" style="background:var(--wp3);color:var(--wp3t)">
+              <span class="emo">🚚</span>
+              <span><span class="nm">대성물류</span><span class="wg">10,320원 · 공제없음</span></span>
+            </button>
+            <button class="sticky" style="background:var(--wp5);color:var(--wp5t)">
+              <span class="emo">📦</span>
+              <span><span class="nm">신흥포장</span><span class="wg">10,500원 · 3.3%</span></span>
+            </button>
+            <button class="sticky add">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              새 근무지
+            </button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>스티키 노트 규격</h3>
+        <dl class="spec">
+          <dt>radius</dt><dd><code>rounded.xxl</code> 20px — 파스텔 피처 카드(28px)보다 조금 각지게 해서 실물 메모 느낌</dd>
+          <dt>elevation</dt><dd><code>level 2</code> <code>rgba(5,0,56,.06) 0 4px 12px</code>. 앱에서 그림자를 쓰는 <b>유일한 컴포넌트</b> — 보드에 "붙어 있는" 느낌을 만듭니다</dd>
+          <dt>최근 사용</dt><dd>맨 위 <b>전폭 88px</b>. 같은 곳에 계속 나가는 사용자는 여기서 끝</dd>
+          <dt>나머지</dt><dd>2열 그리드, 최소 112px</dd>
+          <dt>글자색</dt><dd>파스텔 5종 위 <code>#1c1c1e</code> / 진한 3종 위 <code>#ffffff</code>. 전부 대비 4.5:1 이상</dd>
+          <dt>색·이모지</dt><dd>추가 시 <b>미사용 값 중 자동 배정</b>. 고르는 부담 제거</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>동작</h3>
+        <ul>
+          <li>탭 → 즉시 Step 2. 확인 버튼 없음</li>
+          <li>스텝 인디케이터는 <strong>숫자가 아니라 막대 3개</strong>. "1/3"도 못 읽는 사용자가 있습니다</li>
+          <li>정렬은 최근 사용순 자동. 수동 정렬 없음</li>
+          <li>근무지 0곳이면 이 스텝을 건너뛰고 생성 폼으로 직행</li>
+        </ul>
+      </div>
+      <div class="card pastel-t">
+        <h3>날짜는 헤더에만</h3>
+        <p>날짜 선택 UI를 스텝에 넣지 않습니다. 오늘이 기본이고, 다른 날은 달력에서 그 날짜를 탭해 진입합니다. 스텝을 4개로 늘리면 <strong>3탭 원칙이 깨집니다</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 4. Step 2 ═══════════ -->
+<section class="sect">
+  <p class="route">/log/new · Step 2 / 3</p>
+  <h2>기록 입력 ② 시간</h2>
+  <p class="lede">기본 모드는 <strong>"시간만 입력"</strong>입니다. 저문해 사용자는 대부분 프리셋 하나 누르고 끝납니다. 출퇴근 시각 모드는 야간수당이 필요한 사람만 씁니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="scrim" style="flex:none;height:36px"></div>
+      <div class="sheet" style="flex:1">
+        <div class="grab"></div>
+        <div class="sh-h">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px">
+            <div style="display:flex;align-items:center;gap:9px;font-size:17px;font-weight:500">
+              <span class="sq" style="background:var(--wp1);width:16px;height:16px"></span>🔩 한국공업
+            </div>
+            <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+          </div>
+          <p style="margin:6px 0 0;font-size:14px;color:var(--steel)">몇 시간 일했어요?</p>
+        </div>
+        <div class="sh-b">
+          <div class="seg">
+            <button aria-selected="true">시간만 입력</button>
+            <button aria-selected="false">출퇴근 시각</button>
+          </div>
+          <div class="presets">
+            <button class="preset">4시간</button>
+            <button class="preset">8시간</button>
+            <button class="preset">10시간</button>
+            <button class="preset" aria-pressed="true">12시간</button>
+          </div>
+          <div class="nudge">
+            <button aria-label="30분 빼기">−30분</button>
+            <div class="v">12시간 0분</div>
+            <button aria-label="30분 더하기">+30분</button>
+          </div>
+          <p class="hint">쉬는 시간 빼고 <strong>실제로 일한 시간</strong>이에요</p>
+          <div class="trow">
+            <span style="font-size:19px">📅</span> 특근 · 휴일이에요
+            <span class="sw"></span>
+          </div>
+        </div>
+        <div class="sh-f"><button class="btn">다음</button></div>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card pastel-c">
+        <h3>기획서 수정 — 휴게시간 처리 <span class="tag">필수</span></h3>
+        <p>원본은 두 모드 모두에 휴게 칩을 뒀습니다. 그러면 <strong>12시간을 누른 사용자에게 11시간이 나옵니다.</strong> 사용자는 앱이 틀렸다고 판단합니다.</p>
+        <p>→ <strong>시간만 입력 모드 = 입력값이 곧 실근로시간.</strong> 휴게 칩을 숨기고 <code>breakMinutes = 0</code>으로 저장합니다. 휴게 차감은 <strong>출퇴근 시각 모드에서만</strong> 적용합니다.</p>
+      </div>
+      <div class="card">
+        <h3>구성</h3>
+        <dl class="spec">
+          <dt>세그먼트</dt><dd><code>toggle-monthly-yearly</code> 규격 — <code>surface</code> 배경 + <code>rounded.full</code> + padding 4px. 마지막 선택 모드를 <b>근무지별로</b> 기억</dd>
+          <dt>프리셋</dt><dd>72px 2×2 <b>pill</b>. 선택 시 <b><code>pill-tab-active</code> 규격</b>(black + 흰 글자)</dd>
+          <dt>미세조정</dt><dd>±30분 pill 56px. 클램프 30분 ~ 24시간</dd>
+          <dt>특근 토글</dt><dd>ON → <code>coral-light</code> 배경 + <code>coral-dark</code> 글자. <b>색만으로 인지 가능</b></dd>
+          <dt>5인 미만</dt><dd>근무지 설정이 ON이면 <code>badge-tag-yellow</code> "가산수당이 없어요"</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>출퇴근 시각 모드</h3>
+        <ul>
+          <li>시작·종료 대형 시간 피커 (5분 단위)</li>
+          <li>종료 &lt; 시작 → <strong>"다음날" 칩 자동 표시</strong> → +24h 처리</li>
+          <li>휴게 칩 표시 (근무지 <code>defaultBreakMinutes</code> 프리필)</li>
+          <li>야간(22:00~06:00) 구간이 있으면 야간 칩. <strong>휴게는 시간 비례 균등 차감</strong> + "휴게시간은 나눠서 계산했어요" 1줄 고지</li>
+          <li>실근로 &lt; 0 → 저장 차단 "쉬는 시간이 일한 시간보다 길어요"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 5. Step 3 ═══════════ -->
+<section class="sect">
+  <p class="route">/log/new · Step 3 / 3</p>
+  <h2>기록 입력 ③ 확인</h2>
+  <p class="lede">숫자 하나가 화면을 지배합니다. 내역은 그 아래 작게 — 궁금한 사람만 읽으면 됩니다. Step 2에서 값을 바꾸면 이 금액이 <strong>실시간으로</strong> 따라옵니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="scrim" style="flex:none;height:36px"></div>
+      <div class="sheet" style="flex:1">
+        <div class="grab"></div>
+        <div class="sh-h">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px">
+            <div style="display:flex;align-items:center;gap:9px;font-size:17px;font-weight:500">
+              <span class="sq" style="background:var(--wp1);width:16px;height:16px"></span>🔩 한국공업
+            </div>
+            <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          </div>
+          <p style="margin:6px 0 0;font-size:14px;color:var(--steel)">8월 26일 (수) · 12시간</p>
+        </div>
+        <div class="sh-b">
+          <div class="env pale" style="text-align:center;padding:22px 20px">
+            <span class="est" style="position:static;display:inline-block;margin-bottom:10px">예상 금액이에요</span>
+            <p class="env-k" style="color:var(--yellow-dark)">오늘 일당</p>
+            <p style="margin:2px 0 0;font-size:56px;font-weight:500;letter-spacing:-1.8px;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums">161,000<small style="font-size:24px;letter-spacing:0">원</small></p>
+          </div>
+          <div class="bd">
+            <div class="bd-r"><span>기본 8시간 <span class="mx">×1.0</span></span><b>92,000</b></div>
+            <div class="bd-r"><span>연장 4시간 <span class="mx">×1.5</span></span><b>69,000</b></div>
+            <div class="bd-r" style="color:var(--stone)"><span>시급 11,500원 · 4대보험</span><span>공제는 월 정산에서</span></div>
+          </div>
+        </div>
+        <div class="sh-f">
+          <button class="btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            저장
+          </button>
+        </div>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>구성</h3>
+        <dl class="spec">
+          <dt>일당</dt><dd><b>56px / 500 / <code>ink</code></b> · <code>surface-yellow</code> 파스텔 카드 위. 실수령이 아니라 <b>세전 일당</b></dd>
+          <dt>고지</dt><dd><code>badge-tag-coral</code> "예상 금액이에요" — 원본 기획서의 <b>도장 스탬프를 대체</b>합니다. Miro 시스템에 도장은 없습니다</dd>
+          <dt>내역</dt><dd>14px. <code>breakdown[]</code> 그대로. 배율은 <code>rounded.full</code> 모노 칩</dd>
+          <dt>공제</dt><dd><b>표시하지 않음.</b> "공제는 월 정산에서" 한 줄만</dd>
+        </dl>
+      </div>
+      <div class="card pastel-y">
+        <h3>왜 일당 단계에서 공제를 계산하지 않나</h3>
+        <p><code>DAILY_WORKER</code>(일용직 신고)는 일 15만원 기준이라 대부분 <strong>0원</strong>이 나옵니다. 일별로 "공제 0원"을 표시하면 3.3% 근무지와 나란히 보일 때 오히려 혼란을 줍니다. 공제는 월 단위 개념으로만 노출합니다.</p>
+      </div>
+      <div class="card">
+        <h3>저장 시퀀스</h3>
+        <ul>
+          <li>중복 검사 (같은 <code>date</code> + 같은 <code>workplaceId</code>) → <strong>[따로 추가]</strong>(기본, 하루 2탕) / <strong>[바꾸기]</strong>. 다른 근무지면 묻지 않음</li>
+          <li><code>hourlyWageSnapshot</code> · <code>deductionSnapshot</code> 고정</li>
+          <li><code>paymentStatus = 'UNPAID'</code> — 받았다고 표시하기 전까지 전부 미수금</li>
+          <li>홈 복귀 + <strong>5초 되돌리기 스낵바</strong>. 원본의 스탬프 애니메이션은 <b>제거</b>(Miro는 장식 모션을 쓰지 않음), 전환은 150~200ms ease만</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 6. 달력 ═══════════ -->
+<section class="sect">
+  <p class="route">/calendar · 달력</p>
+  <h2>달력</h2>
+  <p class="lede">스티키 노트를 붙여둔 보드처럼 읽힙니다. 글자를 못 읽어도 <strong>색 사각형만으로 "어디서 일했는지"</strong>가 보입니다. 근무지 색 배정이 기능인 이유가 이 화면에 있습니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="abar">
+        <button class="ibtn bare" aria-label="이전 달"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="abar-t">2026년 8월</div>
+        <button class="ibtn bare" aria-label="다음 달"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="calbar">
+          <div>일한 날<b>20일</b></div>
+          <div>일한 시간<b>188시간</b></div>
+          <div style="text-align:right">세전<b>2,314,120</b></div>
+        </div>
+        <div class="cal">
+          <div class="dw s">일</div><div class="dw">월</div><div class="dw">화</div><div class="dw">수</div><div class="dw">목</div><div class="dw">금</div><div class="dw">토</div>
+          <div class="cell e"></div><div class="cell e"></div><div class="cell e"></div><div class="cell e"></div><div class="cell e"></div><div class="cell e"></div>
+          <div class="cell"><span class="d">1</span><span class="dd"><i style="background:var(--wp3)"></i></span><span class="h">8h</span></div>
+
+          <div class="cell off"><span class="d">2</span></div>
+          <div class="cell"><span class="d">3</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">4</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">5</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">6</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">7</span><span class="dd"><i style="background:var(--wp6)"></i><i style="background:var(--wp1)"></i></span><span class="h">20h</span></div>
+          <div class="cell hol"><span class="d">8</span><span class="dd"><i style="background:var(--wp1)"></i></span><span class="h">12h</span></div>
+
+          <div class="cell off"><span class="d">9</span></div>
+          <div class="cell"><span class="d">10</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">11</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">12</span><span class="dd"><i style="background:var(--wp1)"></i></span><span class="h">12h</span></div>
+          <div class="cell"><span class="d">13</span><span class="dd"><i style="background:var(--wp1)"></i></span><span class="h">12h</span></div>
+          <div class="cell"><span class="d">14</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell off"><span class="d">15</span></div>
+
+          <div class="cell off"><span class="d">16</span></div>
+          <div class="cell"><span class="d">17</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">18</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">19</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">20</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">21</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell"><span class="d">22</span><span class="dd"><i style="background:var(--wp3)"></i></span><span class="h">8h</span></div>
+
+          <div class="cell off"><span class="d">23</span></div>
+          <div class="cell"><span class="d">24</span><span class="dd"><i style="background:var(--wp1)"></i></span><span class="h">12h</span></div>
+          <div class="cell"><span class="d">25</span><span class="dd"><i style="background:var(--wp6)"></i></span><span class="h">8h</span></div>
+          <div class="cell today"><span class="d">26</span></div>
+          <div class="cell off"><span class="d">27</span></div>
+          <div class="cell off"><span class="d">28</span></div>
+          <div class="cell off"><span class="d">29</span></div>
+
+          <div class="cell off"><span class="d">30</span></div>
+          <div class="cell off"><span class="d">31</span></div>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</button>
+        <button class="tab" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 21V8l6-4 6 4v13M15 21V11h6v10M3 21h18"/></svg>근무지</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>설정</button>
+      </nav>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>셀 표기 규칙</h3>
+        <dl class="spec">
+          <dt>마커</dt><dd>원형 점이 아니라 <b>9px 라운드 사각(<code>rounded.xs</code>)</b> — 스티키 미니어처. 하루 여러 건이면 여러 개 (8/7 = 하루 2탕)</dd>
+          <dt>테두리</dt><dd>파스텔은 흰 배경에서 경계가 사라지므로 <code>rgba(5,0,56,.08)</code> 1px 필수</dd>
+          <dt>시간</dt><dd>마커 아래 10.5px. 여러 건이면 <b>합계</b></dd>
+          <dt>오늘</dt><dd><code>primary</code> 1px 테두리</dd>
+          <dt>특근·휴일</dt><dd><b><code>coral-light</code> 셀 배경</b>. 마커와 색이 겹치지 않게 지면으로 구분</dd>
+          <dt>미근무</dt><dd>배경 없음, 날짜만 <code>muted</code>. <b>탭 가능</b> (그 날짜로 입력)</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>동작</h3>
+        <ul>
+          <li>월 이동은 <strong>좌우 스와이프 + 화살표 버튼 둘 다</strong>. 스와이프를 모르는 사용자가 있습니다</li>
+          <li>날짜 탭 → 그날 기록 시트 → 탭 수정 / 스와이프 삭제</li>
+          <li>삭제는 즉시 실행 금지 → <strong>5초 Undo</strong> 후 커밋</li>
+          <li>상단 요약은 <strong>실수령이 아니라 세전</strong>. 실수령은 월정산의 몫</li>
+        </ul>
+      </div>
+      <div class="card pastel-c">
+        <h3>색이 부족해지는 지점</h3>
+        <p>근무지가 <strong>9곳을 넘으면 색이 반복</strong>됩니다. 이모지를 반드시 병행하고, 색맹 사용자를 위해 날짜 상세 시트에는 근무지 이름을 텍스트로 함께 노출합니다. 색은 <strong>보조 단서지 유일한 단서가 아닙니다</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 7. 월간 정산 ═══════════ -->
+<section class="sect">
+  <p class="route">/summary · 월간 정산</p>
+  <h2>월간 정산</h2>
+  <p class="lede">기획서의 급여봉투 카드를 Miro 규격으로 옮긴 것입니다. 절취선 <code>1px dashed</code> 한 줄만 남기고 종이 노이즈·도장은 제거했습니다. <strong>이미지로 저장·공유해도 그대로 떨어지도록</strong> 설계합니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp tall">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="abar">
+        <div class="abar-t">2026년 8월
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <button class="ibtn" aria-label="내보내기">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M12 16V4M8 8l4-4 4 4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+      </div>
+      <div class="body">
+        <div class="env">
+          <span class="est">예상 금액이에요</span>
+          <p class="env-k">받을 돈</p>
+          <p class="money">2,230,291<small>원</small></p>
+          <div class="tear"></div>
+          <div class="kv"><span>세전 합계</span><b>2,314,120원</b></div>
+          <div class="kv"><span>공제</span><b class="neg">−83,829원</b></div>
+
+          <div class="subs">
+            <div class="sub-r"><span class="sq" style="background:var(--wp6)"></span>
+              <span class="nm">🏭 삼성전기</span><span class="hh">14일 · 112h</span><span class="am">1,344,000</span></div>
+            <div class="sub-r"><span class="sq" style="background:var(--wp1)"></span>
+              <span class="nm">🔩 한국공업</span><span class="hh">5일 · 60h</span><span class="am">805,000</span></div>
+            <div class="sub-r"><span class="sq" style="background:var(--wp3)"></span>
+              <span class="nm">🚚 대성물류</span><span class="hh">2일 · 16h</span><span class="am">165,120</span></div>
+          </div>
+          <div class="disc">
+            시간 내역 자세히 보기
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="info">
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>이 금액은 예상이에요. 실제 받는 돈과 다를 수 있어요.</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>같이 일하는 사람이 5명보다 적으면 1.5배 수당이 없어요.</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>일주일에 15시간 넘게 일하면 하루치를 더 받을 권리가 있어요.</div>
+          <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>돈을 못 받으면 <span class="tel">1350</span>으로 전화하세요. 통역이 있어요.</div>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>홈</button>
+        <button class="tab" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 21V8l6-4 6 4v13M15 21V11h6v10M3 21h18"/></svg>근무지</button>
+        <button class="tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>설정</button>
+      </nav>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>정산 카드 규격</h3>
+        <dl class="spec">
+          <dt>컨테이너</dt><dd><code>card-feature</code> — <code>canvas</code> + <code>rounded.xxxl</code> 28px + <code>hairline-soft</code> 1px. <b>그림자 없음</b></dd>
+          <dt>절취선</dt><dd><code>border-top:1px dashed hairline-strong</code>, 카드 폭 전체로 확장(<code>margin:0 -20px</code>). 봉투 정체성의 마지막 흔적</dd>
+          <dt>실수령</dt><dd>48px / 500 / <code>success-accent</code> / <code>-1.5px</code></dd>
+          <dt>고지</dt><dd>우상단 <code>badge-tag-coral</code> pill</dd>
+          <dt>소계</dt><dd>스티키 색 사각 + 이모지 + 이름 + 일수·시간 + 금액. <code>comparison-row</code> 규격의 <code>hairline-soft</code> 구분선</dd>
+        </dl>
+      </div>
+      <div class="card pastel-c">
+        <h3>공제 합산 규칙 <span class="tag">계산</span></h3>
+        <p>이 예시는 삼성전기 3.3% · 한국공업 4대보험(국민연금 제외 4.904%) · 대성물류 공제없음이 섞여 있습니다. 근무지마다 공제 방식이 다른 것이 <strong>정상</strong>입니다.</p>
+        <p><code>월 공제액 = Σ (근무지별 세전 × 근무지별 요율)</code><br>전체 세전에 단일 요율을 곱하면 <strong>틀립니다</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>안내 박스</h3>
+        <ul>
+          <li>4줄 전부 <strong>번역 + 원어민 검수 대상</strong>. 법률 문구를 직역하지 않고 상황 설명으로 풀어씁니다</li>
+          <li>1350은 <code>tel:</code> 링크. <code>ink</code> + 600</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>내보내기</h3>
+        <dl class="spec">
+          <dt>Phase 1</dt><dd>전체 기록 <b>JSON 백업/복원</b> 1개. 기기 분실 = 증거 전소를 막는 최소 장치</dd>
+          <dt>Phase 3</dt><dd>정산 카드 PNG · 한국어 병기 A4 PDF · CSV</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 8. 미수금 ═══════════ -->
+<section class="sect">
+  <p class="route new">/unpaid · 신규</p>
+  <h2>못 받은 돈</h2>
+  <p class="lede">기획서에서 새로 넣은 화면입니다. <strong>다른 급여계산기에는 없는 유일한 화면</strong>이고, 사용자가 이 앱을 남에게 소개할 이유가 여기서 나옵니다. 계산은 미끼고, 제품은 여기입니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="abar">
+        <button class="ibtn bare" aria-label="뒤로"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="abar-t" style="font-size:20px">못 받은 돈</div>
+        <span style="width:40px"></span>
+      </div>
+      <div class="body">
+        <div class="bigwarn">
+          <div class="k">아직 못 받은 돈</div>
+          <div class="v">1,217,800<small>원</small></div>
+        </div>
+
+        <div class="upc">
+          <div class="upc-t">
+            <span class="sq" style="background:var(--wp3);width:16px;height:16px"></span>
+            <span class="nm">🚚 대성물류</span><span class="am">412,800</span>
+          </div>
+          <div class="row-s" style="margin-top:4px">2026년 7월 · 5일 · 40시간</div>
+          <span class="due l">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            8월 5일에 받기로 했는데 21일 지났어요
+          </span>
+          <button class="btn ok" style="margin-top:12px">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            받았어요
+          </button>
+        </div>
+
+        <div class="upc">
+          <div class="upc-t">
+            <span class="sq" style="background:var(--wp1);width:16px;height:16px"></span>
+            <span class="nm">🔩 한국공업</span><span class="am">805,000</span>
+          </div>
+          <div class="row-s" style="margin-top:4px">2026년 8월 · 5일 · 60시간</div>
+          <span class="due w">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+            9월 10일에 받기로 했어요
+          </span>
+          <button class="btn ok" style="margin-top:12px">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            받았어요
+          </button>
+        </div>
+
+        <button class="helpbtn">
+          <span style="font-size:24px">📄</span>
+          <span>돈을 못 받았을 때<br><span style="font-size:13px;color:var(--muted)">신고하는 방법을 알려드려요</span></span>
+          <svg class="ar" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="snack">
+        받았다고 표시했어요
+        <button>되돌리기</button>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>구성</h3>
+        <dl class="spec">
+          <dt>총액 카드</dt><dd><code>card-feature-coral</code> 규격 — <code>coral-light</code> 지면 + <code>rounded.xxxl</code>. 숫자 <b>48px / 500 / <code>coral-dark</code></b></dd>
+          <dt>집계 단위</dt><dd><b>근무지 × 월</b>. 일별로 쪼개지 않음 — 임금 지급도 분쟁도 월 단위입니다</dd>
+          <dt>지급일 배지</dt><dd>대기 = <code>surface</code> / 경과 = <code>coral-light</code> + "N일 지났어요". <code>payDayOfMonth</code> 기준 자동</dd>
+          <dt>받았어요</dt><dd>56px <code>success-accent</code> 아웃라인 pill. 탭 1회 → PAID + <b>5초 되돌리기</b></dd>
+          <dt>부분 지급</dt><dd>길게 누르기 → 금액 입력 → <code>PARTIAL</code> + <code>paidAmount</code></dd>
+          <dt>신고 안내</dt><dd><code>cta-banner-dark</code> 규격 — <code>primary</code> 지면 + <code>rounded.xxxl</code></dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>coral을 이만큼 쓰는 이유</h3>
+        <ul>
+          <li>다른 화면에서 coral은 <strong>칩 하나</strong>로 절제합니다. 이 화면만 총액에 지면으로 씁니다</li>
+          <li>이 앱에서 유일하게 "지금 뭔가 잘못되고 있다"고 말해야 하는 화면이기 때문입니다</li>
+          <li>미수금 0원이면 <code>teal-light</code> + <code>moss-dark</code>로 <strong>"다 받았어요"</strong> 상태를 보여줍니다. 빈 화면을 두지 않습니다</li>
+        </ul>
+      </div>
+      <div class="card dark">
+        <h3>톤 규칙</h3>
+        <p style="color:#fff">"이건 불법이에요"라고 쓰지 않습니다. <strong>"이만큼 못 받았어요"라는 사실만</strong> 보여줍니다. 앱이 사용자를 사업주와의 갈등에 먼저 밀어넣지 않습니다.</p>
+        <p>신고 안내(Phase 3)는 진정 절차를 4단계 그림으로, 고용노동부 1350(외국어 상담 시간 병기)과 외국인노동자지원센터 연락처, 그리고 "이 앱의 기록을 증거로 내는 방법"을 한국어 병기 PDF 내보내기로 연결합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 9. 근무지 ═══════════ -->
+<section class="sect">
+  <p class="route">/workplaces/:id · 근무지 설정</p>
+  <h2>근무지 만들기 · 수정</h2>
+  <p class="lede">앱에서 <strong>유일하게 복잡해도 되는 화면</strong>입니다. 한 번만 설정하면 이후 기록은 3탭으로 끝나기 때문입니다. 대신 전문 용어는 전부 상황 설명으로 바꿉니다.</p>
+  <div class="sect-grid">
+    <div class="phone"><div class="vp tall">
+      <div class="sbar"><span>9:41</span><i></i></div>
+      <div class="abar">
+        <button class="ibtn bare" aria-label="닫기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <div class="abar-t" style="font-size:20px">한국공업</div>
+        <span style="width:40px"></span>
+      </div>
+      <div class="body" style="gap:18px">
+        <div class="fld">
+          <label>색깔과 그림</label>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="width:60px;height:60px;border-radius:var(--r-xxl);background:var(--wp1);display:grid;place-items:center;font-size:28px;flex:none;box-shadow:var(--sh-card)">🔩</span>
+            <div class="swr">
+              <i style="background:var(--wp1)" class="sel"></i><i style="background:var(--wp2)"></i>
+              <i style="background:var(--wp3)"></i><i style="background:var(--wp5)"></i>
+              <i style="background:var(--wp6)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label>시급 — 1시간에 받는 돈</label>
+          <div class="inp">11,500<span class="u">원</span></div>
+        </div>
+
+        <div class="fld">
+          <label>돈을 어떻게 받아요?</label>
+          <div class="rad"><span class="rr"></span>
+            <span><span class="tt">3.3% 떼는 곳</span><span class="ss">인력사무소 · 일용직. 4대보험 없음</span></span></div>
+          <div class="rad"><span class="rr"></span>
+            <span><span class="tt">일용직으로 신고하는 곳</span><span class="ss">하루 15만원 아래면 세금이 없어요</span></span></div>
+          <div class="rad on"><span class="rr"></span>
+            <span><span class="tt">4대보험 내는 곳</span><span class="ss">정식 근로계약</span></span></div>
+          <div class="chks">
+            <div class="chk"><span class="bx"></span>국민연금 떼요</div>
+            <div class="chk on"><span class="bx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>건강보험 떼요</div>
+            <div class="chk on"><span class="bx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>고용보험 떼요<span class="rateout">4.904%</span></div>
+          </div>
+          <div class="rad"><span class="rr"></span>
+            <span><span class="tt">전액 받는 곳</span><span class="ss">현금 지급, 떼는 것 없음</span></span></div>
+        </div>
+
+        <div class="fld">
+          <label>일하는 사람 수</label>
+          <div class="trow">같이 일하는 사람이 5명보다 적어요<span class="sw"></span></div>
+          <p class="hint" style="text-align:left;margin-top:2px">켜면 1.5배 · 2배 수당이 붙지 않아요</p>
+        </div>
+
+        <div class="fld">
+          <label>돈 받는 날</label>
+          <div class="inp">다음 달 <b style="margin:0 5px;font-weight:600">10</b>일<span class="u">매달</span></div>
+        </div>
+      </div>
+      <div style="flex:none;padding:14px 16px 20px;border-top:1px solid var(--hairline-soft);background:var(--canvas)">
+        <button class="btn">저장</button>
+      </div>
+    </div></div>
+    <div class="notes">
+      <div class="card">
+        <h3>공제 방식 4종</h3>
+        <dl class="spec">
+          <dt>RATE_3_3</dt><dd>3.3% 떼는 곳 — <b>가장 흔함</b>. 기본 선택값</dd>
+          <dt>DAILY_WORKER</dt><dd>일용직 신고 — <code>(일급−150,000)×6%×45%</code> + 지방세. <b>15만원 이하면 0원</b></dd>
+          <dt>INSURANCE_4</dt><dd>4대보험 — 선택 시 <b>보험 3종 체크박스가 펼쳐짐</b></dd>
+          <dt>NONE</dt><dd>전액 받는 곳</dd>
+          <dt>선택 표시</dt><dd><code>pricing-card-featured</code> 규격 — <code>brand-blue</code> 2px + <code>featured</code> 배경</dd>
+        </dl>
+      </div>
+      <div class="card pastel-c">
+        <h3>보험 체크박스가 필요한 이유 <span class="tag">계산</span></h3>
+        <p>국민연금은 <strong>상호주의</strong>라 캄보디아·네팔·미얀마·태국 등은 당연적용 대상이 아니고, E-9은 고용보험도 임의가입입니다. <strong>9.4% 일괄 적용은 최대 사용자군에서 틀립니다.</strong></p>
+        <p>국적 판정 로직을 앱에 넣으면 법령 해석 책임을 지게 되므로, 사용자가 <strong>급여명세서를 보고 체크만</strong> 하게 합니다. 체크할 때마다 <code>badge-tag-yellow</code> 요율 배지가 실시간 갱신됩니다.</p>
+      </div>
+      <div class="card">
+        <h3>기타 공제 (스크롤 아래)</h3>
+        <ul>
+          <li>소개비 · 숙소비 · 식대 · 차비 + 직접 입력</li>
+          <li>모드: <code>PER_DAY</code> / <code>PER_MONTH</code> / <code>RATE</code></li>
+          <li>인력사무소는 일당의 8~10%를 소개비로 뗍니다. <strong>이게 빠지면 앱 금액과 실제 봉투가 안 맞고, 사용자는 앱이 틀렸다고 판단합니다</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>삭제 대신 보관</h3>
+        <ul>
+          <li>삭제 버튼은 <strong>존재하지 않습니다</strong>. 과거 기록의 외래키가 깨지고 증거가 사라집니다</li>
+          <li>"이제 여기 안 나가요" = <code>isArchived</code>. 목록에서 숨고 과거 기록은 유지</li>
+          <li>시급·공제방식을 수정해도 <strong>과거 기록 금액은 절대 바뀌지 않습니다</strong> (<code>hourlyWageSnapshot</code> · <code>deductionSnapshot</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  <h3>구현 순서</h3>
+  <p>1. 토큰 + 프리미티브(pill button / card / row / sheet / chip) → 2. 스티키 노트 컴포넌트 → 3. 근무지 폼 → 4. 입력 3스텝 → 5. 홈 → 6. 달력 → 7. 월정산 → 8. 미수금 → 9. 온보딩 + 다국어(문자열 확정 후)</p>
+  <p style="margin-top:20px">일당노트 UI 구성안 v1 · 기획서 v1.0 + <code>DESIGN-ILGIK.md</code> 기준 · 2026-08-11</p>
+  <p>단일 라이트 테마입니다. DESIGN-ILGIK가 다크 모드 토큰을 정의하지 않아(Known Gaps) 임의로 만들지 않고 모든 색을 명시적으로 칠했습니다. 금액 예시는 시급 12,000 / 11,500 / 10,320원 기준으로 상호 정합하게 계산했습니다. 공제 요율은 출시 전 노무사 검증이 필요합니다.</p>
+</div>
+
+</div>
