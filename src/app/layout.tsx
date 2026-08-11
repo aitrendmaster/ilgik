@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { AppProviders } from '@/components/AppProviders'
-import { LocaleFont } from '@/components/LocaleFont'
-import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
+import { AppShell } from '@/components/AppShell'
 import { DEFAULT_LOCALE } from '@/lib/i18n/config'
 import './globals.css'
 
@@ -45,9 +44,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <AppProviders>
-          <LocaleFont />
-          <ServiceWorkerRegistrar />
-          {children}
+          <AppShell>{children}</AppShell>
         </AppProviders>
       </body>
     </html>

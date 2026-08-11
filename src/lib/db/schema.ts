@@ -128,14 +128,17 @@ export class IlgikDB extends Dexie {
 }
 
 /**
- * 브라우저에서만 인스턴스를 만든다. 정적 export 빌드 시 서버에서 이 모듈이
- * 평가되면 indexedDB가 없어 실패한다.
+ * IndexedDB가 있는 환경에서만 인스턴스를 만든다.
+ * 정적 export 빌드 시 서버에서 이 모듈이 평가되면 indexedDB가 없어 실패한다.
+ *
+ * window가 아니라 indexedDB를 확인하는 이유: 실제 의존 대상이 그것이고,
+ * 테스트에서 fake-indexeddb로 주입하면 그대로 동작해야 한다.
  */
 let _db: IlgikDB | null = null
 
 export function getDB(): IlgikDB {
-  if (typeof window === 'undefined') {
-    throw new Error('getDB()는 브라우저에서만 호출할 수 있습니다.')
+  if (typeof indexedDB === 'undefined') {
+    throw new Error('IndexedDB를 쓸 수 없는 환경입니다.')
   }
   if (!_db) _db = new IlgikDB()
   return _db
