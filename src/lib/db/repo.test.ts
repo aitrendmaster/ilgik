@@ -4,6 +4,8 @@ import { calculateMonthlyPay } from '@/lib/payroll'
 import {
   archiveWorkplace,
   clearAll,
+  ensureSettings,
+  readSettings,
   createLog,
   createWorkplace,
   exportBackup,
@@ -38,7 +40,29 @@ function draft(over: Partial<WorkplaceDraft> = {}): WorkplaceDraft {
 beforeEach(async () => {
   await clearAll()
   await getDB().settings.clear()
-  await updateSettings({ nightPayEnabled: false })
+})
+
+describe('설정', () => {
+  it('읽기 경로는 행을 만들지 않는다', async () => {
+    // liveQuery 쿼리어 안에서 쓰면 Dexie가 ReadOnlyError를 던지고
+    // 설정이 없는 상태 — 즉 모든 첫 방문자 — 에서 앱이 죽는다.
+    const s = await readSettings()
+    expect(s.nightPayEnabled).toBe(false)
+    expect(await getDB().settings.get('app')).toBeUndefined()
+  })
+
+  it('ensureSettings는 한 번만 만들고 deviceKey를 유지한다', async () => {
+    const first = await ensureSettings()
+    expect(first.deviceKey).not.toBe('')
+    const second = await ensureSettings()
+    expect(second.deviceKey).toBe(first.deviceKey)
+    expect(await getDB().settings.count()).toBe(1)
+  })
+
+  it('행이 없어도 updateSettings가 동작한다', async () => {
+    await updateSettings({ nightPayEnabled: true })
+    expect((await readSettings()).nightPayEnabled).toBe(true)
+  })
 })
 
 describe('근무지', () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { COLOR_TOKENS, EMOJIS, colorVar, isDarkToken } from '@/lib/db/palette'
 import { archiveWorkplace, createWorkplace, updateWorkplace } from '@/lib/db/repo'
@@ -61,10 +61,25 @@ export function WorkplaceSheet() {
   const [form, setForm] = useState<FormState>(() => emptyForm(1, EMOJIS[0]))
   const [saving, setSaving] = useState(false)
 
-  // 시트를 열 때마다 초기화한다. 새로 만들 때는 미사용 색·이모지를 자동 배정한다.
+  /**
+   * 시트를 열 때 딱 한 번만 초기화한다.
+   *
+   * 의존성에 existing/all(liveQuery 결과)을 그대로 넣으면, 배경에서 아무 DB 쓰기가
+   * 일어나도 배열 identity가 바뀌어 이 effect가 다시 돌고 입력 중이던 값이 지워진다.
+   */
+  const initializedFor = useRef<string | null>(null)
+
   useEffect(() => {
-    if (!open) return
-    if (editingId && existing) {
+    if (!open) {
+      initializedFor.current = null
+      return
+    }
+    const key = editingId ?? 'new'
+    if (initializedFor.current === key) return
+
+    if (editingId) {
+      if (!existing) return // 조회가 끝난 뒤에 채운다
+      initializedFor.current = key
       setForm({
         name: existing.name,
         colorToken: existing.colorToken,
@@ -80,7 +95,9 @@ export function WorkplaceSheet() {
         defaultBreakMinutes: existing.defaultBreakMinutes,
         payDayOfMonth: existing.payDayOfMonth ? String(existing.payDayOfMonth) : '',
       })
-    } else if (!editingId && all) {
+    } else {
+      if (!all) return
+      initializedFor.current = key
       setForm(
         emptyForm(
           pickColorToken(all.map((w) => w.colorToken)),
@@ -128,7 +145,8 @@ export function WorkplaceSheet() {
         showSnack('바꿨어요')
       } else {
         await createWorkplace(payload)
-        showSnack('만들었어요')
+        // 바로 기록 입력으로 이어질 때는 토스트를 띄우지 않는다
+        if (!continueToLog) showSnack('만들었어요')
       }
       close()
       if (continueToLog) openLogSheet(todayISO())

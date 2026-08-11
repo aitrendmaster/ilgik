@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { calculateMonthlyPay, type MonthlyPayResult } from '@/lib/payroll'
 import { getDB, type AppSettings, type WorkLog, type Workplace } from './schema'
-import { getSettings, listLogsInMonth, listWorkplaces, monthOf } from './repo'
+import { listLogsInMonth, listWorkplaces, monthOf, readSettings } from './repo'
 
 /**
  * 정적 export라 첫 렌더는 서버에서 일어난다. IndexedDB는 브라우저에만 있으므로
@@ -34,7 +34,7 @@ export function useWorkplace(id: string | null): Workplace | undefined {
 
 export function useSettings(): AppSettings | undefined {
   const mounted = useMounted()
-  return useLiveQuery(() => (mounted ? getSettings() : undefined), [mounted])
+  return useLiveQuery(() => (mounted ? readSettings() : undefined), [mounted])
 }
 
 export function useMonthLogs(yearMonth: string): WorkLog[] | undefined {

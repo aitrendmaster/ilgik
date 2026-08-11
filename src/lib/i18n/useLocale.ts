@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { create } from 'zustand'
 import { DEFAULT_LOCALE, guessLocale, isSupportedLocale } from './config'
 
 const STORAGE_KEY = 'ilgik.locale'
@@ -19,7 +20,7 @@ export function readStoredLocale(): string | null {
   }
 }
 
-export function writeStoredLocale(locale: string): void {
+function writeStoredLocale(locale: string): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, locale)
   } catch {
@@ -27,25 +28,43 @@ export function writeStoredLocale(locale: string): void {
   }
 }
 
-export function useLocale(): [string, (next: string) => void] {
-  // 정적 export라 서버에서는 기본 로케일로 프리렌더되고, 마운트 후 저장값으로 교체된다.
-  const [locale, setLocale] = useState(DEFAULT_LOCALE)
+/**
+ * ⚠️ 반드시 공유 스토어여야 한다.
+ * 컴포넌트마다 useState를 따로 들면 설정 화면에서 언어를 바꿔도
+ * 번역을 들고 있는 AppProviders는 그 사실을 모른다 — 화면이 안 바뀐다.
+ */
+interface LocaleState {
+  locale: string
+  hydrated: boolean
+  setLocale: (next: string) => void
+  hydrate: () => void
+}
 
-  useEffect(() => {
-    const stored = readStoredLocale()
-    if (stored) {
-      setLocale(stored)
-      return
-    }
-    const guessed = guessLocale(navigator.languages ?? [navigator.language])
-    if (guessed) setLocale(guessed)
-  }, [])
-
-  const update = (next: string) => {
+export const useLocaleStore = create<LocaleState>((set, get) => ({
+  locale: DEFAULT_LOCALE,
+  hydrated: false,
+  setLocale: (next) => {
     if (!isSupportedLocale(next)) return
     writeStoredLocale(next)
-    setLocale(next)
-  }
+    set({ locale: next })
+  },
+  hydrate: () => {
+    if (get().hydrated) return
+    const stored = readStoredLocale()
+    const guessed = stored ?? guessLocale(navigator.languages ?? [navigator.language])
+    set({ locale: guessed ?? DEFAULT_LOCALE, hydrated: true })
+  },
+}))
 
-  return [locale, update]
+export function useLocale(): [string, (next: string) => void] {
+  const locale = useLocaleStore((s) => s.locale)
+  const setLocale = useLocaleStore((s) => s.setLocale)
+  const hydrate = useLocaleStore((s) => s.hydrate)
+
+  // 정적 export라 첫 렌더는 기본 로케일로 프리렌더된다. 마운트 후 저장값으로 교체한다.
+  useEffect(() => {
+    hydrate()
+  }, [hydrate])
+
+  return [locale, setLocale]
 }

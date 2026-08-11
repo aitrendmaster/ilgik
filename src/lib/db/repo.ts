@@ -32,18 +32,36 @@ const SETTINGS_DEFAULTS: AppSettings = {
   schemaVersion: 1,
 }
 
-export async function getSettings(): Promise<AppSettings> {
+/**
+ * 읽기 전용. 행이 없으면 기본값을 돌려준다.
+ *
+ * ⚠️ liveQuery 쿼리어 안에서는 반드시 이 함수를 쓴다.
+ * Dexie는 liveQuery 컨텍스트에서의 쓰기를 ReadOnlyError로 막는다.
+ * 여기서 행을 만들면 설정이 없는 상태 — 즉 모든 첫 방문자 — 에서 앱이 죽는다.
+ */
+export async function readSettings(): Promise<AppSettings> {
+  const existing = await getDB().settings.get('app')
+  return existing ?? SETTINGS_DEFAULTS
+}
+
+/** 설정 행을 최초 1회 만든다. liveQuery 밖에서만 호출한다 */
+export async function ensureSettings(): Promise<AppSettings> {
   const db = getDB()
-  const existing = await db.settings.get('app')
-  if (existing) return existing
-  const created: AppSettings = { ...SETTINGS_DEFAULTS, deviceKey: uid() }
-  await db.settings.put(created)
-  return created
+  return db.transaction('rw', db.settings, async () => {
+    const existing = await db.settings.get('app')
+    if (existing) return existing
+    const created: AppSettings = { ...SETTINGS_DEFAULTS, deviceKey: uid() }
+    await db.settings.put(created)
+    return created
+  })
 }
 
 export async function updateSettings(patch: Partial<AppSettings>): Promise<void> {
-  const current = await getSettings()
-  await getDB().settings.put({ ...current, ...patch, key: 'app' })
+  const db = getDB()
+  await db.transaction('rw', db.settings, async () => {
+    const current = (await db.settings.get('app')) ?? { ...SETTINGS_DEFAULTS, deviceKey: uid() }
+    await db.settings.put({ ...current, ...patch, key: 'app' })
+  })
 }
 
 // ── 근무지 ────────────────────────────────────────────────────
@@ -147,7 +165,7 @@ export async function createLog(draft: LogDraft): Promise<WorkLog> {
   const db = getDB()
   const workplace = await db.workplaces.get(draft.workplaceId)
   if (!workplace) throw new Error('근무지를 찾을 수 없습니다.')
-  const settings = await getSettings()
+  const settings = await readSettings()
 
   const result = calculateDayPay(buildDayPayInput(workplace, draft, settings.nightPayEnabled))
   const ts = nowISO()
