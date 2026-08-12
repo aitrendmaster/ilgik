@@ -184,6 +184,7 @@ export async function createLog(draft: LogDraft): Promise<WorkLog> {
     deductionSnapshot: workplace.deductionType,
     insuranceFlagsSnapshot: workplace.insuranceFlags,
     isUnder5EmployeesSnapshot: workplace.isUnder5Employees,
+    otherDeductionsSnapshot: workplace.otherDeductions ?? [],
 
     workedMinutes: result.workedMinutes,
     regularMinutes: result.regularMinutes,

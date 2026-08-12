@@ -258,3 +258,86 @@ describe('calculateMonthlyPay', () => {
     expect(r.deductionAmount).not.toBe(Math.round(r.grossPay * 0.033))
   })
 })
+
+describe('기타 공제 (소개비 · 숙소비)', () => {
+  const tenDays = Array.from({ length: 10 }, () => ({ grossPay: 100_000, workedMinutes: 480 }))
+
+  it('일당 기준 소개비는 근무일수만큼 뗀다', () => {
+    const r = calculateMonthlyPay(
+      [
+        {
+          workplaceId: 'a',
+          deductionType: 'NONE',
+          otherDeductions: [
+            { type: 'AGENCY_FEE', label: '소개비', mode: 'PER_DAY', value: 10_000 },
+          ],
+          days: tenDays,
+        },
+      ],
+      MONTH,
+    )
+    expect(r.grossPay).toBe(1_000_000)
+    expect(r.legalDeduction).toBe(0)
+    expect(r.otherDeduction).toBe(100_000)
+    expect(r.netPay).toBe(900_000)
+  })
+
+  it('비율 소개비는 세전 기준으로 뗀다', () => {
+    const r = calculateMonthlyPay(
+      [
+        {
+          workplaceId: 'a',
+          deductionType: 'NONE',
+          otherDeductions: [{ type: 'AGENCY_FEE', label: '소개비', mode: 'RATE', value: 0.08 }],
+          days: tenDays,
+        },
+      ],
+      MONTH,
+    )
+    expect(r.otherDeduction).toBe(80_000)
+  })
+
+  it('법정 공제와 기타 공제를 분리해서 보여준다', () => {
+    const r = calculateMonthlyPay(
+      [
+        {
+          workplaceId: 'a',
+          deductionType: 'RATE_3_3',
+          otherDeductions: [
+            { type: 'AGENCY_FEE', label: '소개비', mode: 'PER_DAY', value: 10_000 },
+            { type: 'DORM', label: '숙소비', mode: 'PER_MONTH', value: 150_000 },
+          ],
+          days: tenDays,
+        },
+      ],
+      MONTH,
+    )
+    expect(r.legalDeduction).toBe(33_000) // 1,000,000 × 3.3%
+    expect(r.otherDeduction).toBe(250_000) // 10일치 소개비 + 숙소비
+    expect(r.deductionAmount).toBe(283_000)
+    expect(r.netPay).toBe(717_000)
+    expect(r.byWorkplace[0]?.otherLines.map((l) => l.label)).toEqual(['소개비', '숙소비'])
+  })
+
+  it('값이 0이면 항목으로 만들지 않는다', () => {
+    const r = calculateMonthlyPay(
+      [
+        {
+          workplaceId: 'a',
+          deductionType: 'NONE',
+          otherDeductions: [{ type: 'MEAL', label: '식대', mode: 'PER_DAY', value: 0 }],
+          days: tenDays,
+        },
+      ],
+      MONTH,
+    )
+    expect(r.otherDeduction).toBe(0)
+    expect(r.byWorkplace[0]?.otherLines).toEqual([])
+  })
+
+  it('기타 공제가 없으면 기존 결과와 같다', () => {
+    const r = calculateMonthlyPay([{ workplaceId: 'a', deductionType: 'RATE_3_3', days: tenDays }], MONTH)
+    expect(r.otherDeduction).toBe(0)
+    expect(r.deductionAmount).toBe(r.legalDeduction)
+  })
+})

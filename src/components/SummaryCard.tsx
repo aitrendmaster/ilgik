@@ -14,11 +14,14 @@ export function SummaryCard({
   netPay,
   grossPay,
   deduction,
+  otherDeduction = 0,
   showEstimateBadge = true,
 }: {
   netPay: number
   grossPay: number
   deduction: number
+  /** 소개비·숙소비 등. 세금과 한 덩어리로 묶으면 무엇이 왜 빠졌는지 알 수 없다 */
+  otherDeduction?: number
   showEstimateBadge?: boolean
 }) {
   const t = useTranslations('home')
@@ -47,9 +50,19 @@ export function SummaryCard({
           <dd className="tnum m-0 font-medium text-ink">{formatWon(grossPay)}원</dd>
         </div>
         <div className="flex justify-between text-sm text-slate">
-          <dt>{t('deduction')}</dt>
-          <dd className="tnum m-0 font-medium text-coral-dark">{formatSigned(deduction)}원</dd>
+          <dt>{otherDeduction > 0 ? '세금 · 보험' : t('deduction')}</dt>
+          <dd className="tnum m-0 font-medium text-coral-dark">
+            {formatSigned(deduction - otherDeduction)}원
+          </dd>
         </div>
+        {otherDeduction > 0 && (
+          <div className="flex justify-between text-sm text-slate">
+            <dt>소개비 · 숙소비 등</dt>
+            <dd className="tnum m-0 font-medium text-coral-dark">
+              {formatSigned(otherDeduction)}원
+            </dd>
+          </div>
+        )}
       </dl>
     </section>
   )

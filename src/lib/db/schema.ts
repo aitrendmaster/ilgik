@@ -1,5 +1,11 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { DeductionType, InsuranceFlags, PaySegment } from '@/lib/payroll'
+import type {
+  DeductionType,
+  InsuranceFlags,
+  OtherDeduction,
+  OtherDeductionMode,
+  PaySegment,
+} from '@/lib/payroll'
 
 /**
  * 로컬 우선 저장소. 서버 없이 완전히 동작한다.
@@ -10,14 +16,7 @@ import type { DeductionType, InsuranceFlags, PaySegment } from '@/lib/payroll'
  */
 
 export type PaymentStatus = 'UNPAID' | 'PARTIAL' | 'PAID'
-export type OtherDeductionMode = 'PER_DAY' | 'PER_MONTH' | 'RATE'
-
-export interface OtherDeduction {
-  type: 'AGENCY_FEE' | 'DORM' | 'MEAL' | 'TRANSPORT' | 'CUSTOM'
-  label: string
-  mode: OtherDeductionMode
-  value: number
-}
+export type { OtherDeduction, OtherDeductionMode }
 
 export interface Workplace {
   id: string
@@ -61,6 +60,8 @@ export interface WorkLog {
   deductionSnapshot: DeductionType
   insuranceFlagsSnapshot?: InsuranceFlags
   isUnder5EmployeesSnapshot: boolean
+  /** 소개비·숙소비도 스냅샷한다. 근무지 설정을 바꿔도 지난 달 금액은 변하면 안 된다 */
+  otherDeductionsSnapshot?: OtherDeduction[]
 
   workedMinutes: number
   regularMinutes: number

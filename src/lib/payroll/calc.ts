@@ -17,6 +17,8 @@ import {
   type MonthlyPayResult,
   type PaySegment,
   type SegmentLabel,
+  type OtherDeduction,
+  type OtherDeductionLine,
   type WorkplaceGroup,
   type WorkplaceSubtotal,
 } from './types'
@@ -223,31 +225,67 @@ function deductionForGroup(group: WorkplaceGroup, date: string): { amount: numbe
 }
 
 /**
+ * 기타 공제. 법정 공제와 분리해서 보여준다 —
+ * 세금과 소개비를 한 덩어리로 묶으면 사용자가 무엇이 왜 빠졌는지 알 수 없다.
+ */
+function otherDeductionLines(
+  items: OtherDeduction[] | undefined,
+  gross: number,
+  dayCount: number,
+): OtherDeductionLine[] {
+  if (!items?.length) return []
+  return items
+    .filter((d) => d.value > 0)
+    .map((d) => ({
+      label: d.label,
+      amount:
+        d.mode === 'PER_DAY'
+          ? Math.round(d.value * dayCount)
+          : d.mode === 'RATE'
+            ? Math.round(gross * d.value)
+            : Math.round(d.value),
+    }))
+    .filter((line) => line.amount > 0)
+}
+
+/**
  * 월 정산. date는 요율 테이블 조회에 쓰이므로 해당 월의 아무 날짜(예: "2026-08-01")를 넘긴다.
  */
 export function calculateMonthlyPay(groups: WorkplaceGroup[], date: string): MonthlyPayResult {
   const byWorkplace: WorkplaceSubtotal[] = groups.map((group) => {
     const grossPay = group.days.reduce((sum, d) => sum + d.grossPay, 0)
     const totalMinutes = group.days.reduce((sum, d) => sum + d.workedMinutes, 0)
-    const { amount, rate } = deductionForGroup(group, date)
+    const dayCount = group.days.length
+    const { amount: legalDeduction, rate } = deductionForGroup(group, date)
+    const otherLines = otherDeductionLines(group.otherDeductions, grossPay, dayCount)
+    const otherDeduction = otherLines.reduce((s, l) => s + l.amount, 0)
+    const deductionAmount = legalDeduction + otherDeduction
+
     return {
       workplaceId: group.workplaceId,
       grossPay,
-      deductionAmount: amount,
+      legalDeduction,
+      otherDeduction,
+      otherLines,
+      deductionAmount,
       deductionRate: rate,
-      netPay: grossPay - amount,
+      netPay: grossPay - deductionAmount,
       totalMinutes,
-      dayCount: group.days.length,
+      dayCount,
     }
   })
 
   const grossPay = byWorkplace.reduce((s, w) => s + w.grossPay, 0)
-  const deductionAmount = byWorkplace.reduce((s, w) => s + w.deductionAmount, 0)
+  const legalDeduction = byWorkplace.reduce((s, w) => s + w.legalDeduction, 0)
+  const otherDeduction = byWorkplace.reduce((s, w) => s + w.otherDeduction, 0)
+  const deductionAmount = legalDeduction + otherDeduction
   const totalMinutes = byWorkplace.reduce((s, w) => s + w.totalMinutes, 0)
   const dayCount = byWorkplace.reduce((s, w) => s + w.dayCount, 0)
 
   return {
     grossPay,
+    legalDeduction,
+    otherDeduction,
     deductionAmount,
     netPay: grossPay - deductionAmount,
     totalMinutes,

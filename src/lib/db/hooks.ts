@@ -77,6 +77,7 @@ export function useMonthView(yearMonth: string): MonthView | undefined {
       // 근무지 현재 설정이 아니라 기록 시점 스냅샷을 쓴다
       deductionType: group[0]!.deductionSnapshot,
       insuranceFlags: group[0]!.insuranceFlagsSnapshot,
+      otherDeductions: group[0]!.otherDeductionsSnapshot ?? [],
       days: group.map((l) => ({ grossPay: l.grossPay, workedMinutes: l.workedMinutes })),
     })),
     `${yearMonth}-01`,

@@ -184,6 +184,7 @@ export default function SettingsPage() {
       <p className="mb-[-4px] mt-2 text-[13px] font-semibold text-steel">서비스 정보</p>
       <nav className="flex flex-col gap-2">
         {[
+          { href: '/unpaid', label: '못 받은 돈' },
           { href: '/support', label: '문의하기' },
           { href: '/legal/terms', label: '이용약관' },
           { href: '/legal/privacy', label: '개인정보 처리방침' },

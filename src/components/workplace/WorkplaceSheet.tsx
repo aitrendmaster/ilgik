@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { BreakPicker } from '@/components/worklog/BreakPicker'
+import { OtherDeductionFields } from './OtherDeductionFields'
 import { COLOR_TOKENS, EMOJIS, colorVar, isDarkToken } from '@/lib/db/palette'
 import { archiveWorkplace, createWorkplace, updateWorkplace } from '@/lib/db/repo'
 import { useWorkplace, useWorkplaces } from '@/lib/db/hooks'
 import { insuranceRateFor, minimumWageAt } from '@/lib/payroll'
-import type { DeductionType, InsuranceFlags } from '@/lib/payroll'
+import type { DeductionType, InsuranceFlags, OtherDeduction } from '@/lib/payroll'
 import { formatRate, formatWon } from '@/lib/format'
 import { todayISO } from '@/lib/db/repo'
 import { useLogSheet, useSnackbar, useWorkplaceSheet } from '@/store/ui'
@@ -36,6 +37,7 @@ interface FormState {
   isUnder5Employees: boolean
   defaultBreakMinutes: number
   payDayOfMonth: string
+  otherDeductions: OtherDeduction[]
 }
 
 function emptyForm(colorToken: number, emoji: string): FormState {
@@ -49,6 +51,7 @@ function emptyForm(colorToken: number, emoji: string): FormState {
     isUnder5Employees: false,
     defaultBreakMinutes: 60,
     payDayOfMonth: '',
+    otherDeductions: [],
   }
 }
 
@@ -95,6 +98,7 @@ export function WorkplaceSheet() {
         isUnder5Employees: existing.isUnder5Employees,
         defaultBreakMinutes: existing.defaultBreakMinutes,
         payDayOfMonth: existing.payDayOfMonth ? String(existing.payDayOfMonth) : '',
+        otherDeductions: existing.otherDeductions ?? [],
       })
     } else {
       if (!all) return
@@ -137,7 +141,7 @@ export function WorkplaceSheet() {
         insuranceFlags:
           form.deductionType === 'INSURANCE_4' ? form.insuranceFlags : undefined,
         isUnder5Employees: form.isUnder5Employees,
-        otherDeductions: existing?.otherDeductions ?? [],
+        otherDeductions: form.otherDeductions,
         payDayOfMonth: form.payDayOfMonth ? Number(form.payDayOfMonth) : undefined,
       }
 
@@ -347,6 +351,15 @@ export function WorkplaceSheet() {
           기록할 때 이 값이 먼저 들어가요. 그날그날 바꿀 수 있어요.
           출퇴근 시각을 넣을 때만 빼고, 시간만 넣을 때는 빼지 않아요.
         </p>
+      </Field>
+
+      {/* 기타 공제 — 실제로 봉투에서 빠지는 것들 */}
+      <Field label="따로 떼는 돈 (없으면 비워두세요)">
+        <OtherDeductionFields
+          items={form.otherDeductions}
+          onChange={(next) => patch({ otherDeductions: next })}
+          hourlyWage={wage}
+        />
       </Field>
 
       {/* 지급일 */}

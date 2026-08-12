@@ -17,6 +17,22 @@ export interface InsuranceFlags {
   employment: boolean
 }
 
+/**
+ * 법정 공제 외에 실제로 봉투에서 빠지는 것들.
+ * 인력사무소는 일당의 8~10%를 소개비로 뗀다. 이게 빠지면 앱 금액과
+ * 실제 받는 돈이 안 맞고, 사용자는 앱이 틀렸다고 판단한다.
+ */
+export type OtherDeductionType = 'AGENCY_FEE' | 'DORM' | 'MEAL' | 'TRANSPORT' | 'CUSTOM'
+export type OtherDeductionMode = 'PER_DAY' | 'PER_MONTH' | 'RATE'
+
+export interface OtherDeduction {
+  type: OtherDeductionType
+  label: string
+  mode: OtherDeductionMode
+  /** PER_DAY·PER_MONTH는 원, RATE는 0~1 비율 */
+  value: number
+}
+
 export type SegmentLabel =
   | 'regular' // 기본 ×1.0
   | 'overtime' // 연장 ×1.5
@@ -70,12 +86,24 @@ export interface WorkplaceGroup {
   workplaceId: string
   deductionType: DeductionType
   insuranceFlags?: InsuranceFlags
+  otherDeductions?: OtherDeduction[]
   days: DayLogLike[]
+}
+
+export interface OtherDeductionLine {
+  label: string
+  amount: number
 }
 
 export interface WorkplaceSubtotal {
   workplaceId: string
   grossPay: number
+  /** 세금·4대보험 */
+  legalDeduction: number
+  /** 소개비·숙소비 등 */
+  otherDeduction: number
+  otherLines: OtherDeductionLine[]
+  /** 법정 + 기타 */
   deductionAmount: number
   /** 0~1. INSURANCE_4는 체크된 항목 합, DAILY_WORKER는 실효세율(참고용) */
   deductionRate: number
@@ -86,6 +114,8 @@ export interface WorkplaceSubtotal {
 
 export interface MonthlyPayResult {
   grossPay: number
+  legalDeduction: number
+  otherDeduction: number
   deductionAmount: number
   netPay: number
   totalMinutes: number
