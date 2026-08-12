@@ -8,6 +8,7 @@ import { Snackbar } from './ui/Snackbar'
 import { LogSheet } from './worklog/LogSheet'
 import { WorkplaceSheet } from './workplace/WorkplaceSheet'
 import { ensureSettings } from '@/lib/db/repo'
+import { flushInquiries } from '@/lib/support'
 
 /**
  * 시트와 스낵바는 한 번만 마운트한다.
@@ -20,6 +21,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     void ensureSettings().catch(() => {
       // 설정이 없어도 기본값으로 동작한다. 앱 사용을 막지 않는다.
     })
+  }, [])
+
+  // 백엔드가 열리면 적어두었던 문의를 올린다. 실패해도 UI를 막지 않는다
+  useEffect(() => {
+    void flushInquiries().catch(() => {})
   }, [])
 
   return (

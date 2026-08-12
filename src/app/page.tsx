@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { IconButton, Screen } from '@/components/Screen'
 import { SummaryCard } from '@/components/SummaryCard'
@@ -8,6 +10,7 @@ import { colorVar } from '@/lib/db/palette'
 import { monthOf, todayISO } from '@/lib/db/repo'
 import { formatWon, parseDateParts, splitHours } from '@/lib/format'
 import { useLogSheet, useWorkplaceSheet } from '@/store/ui'
+import { useGuestStatus } from '@/lib/guest'
 
 export default function HomePage() {
   const t = useTranslations('home')
@@ -20,6 +23,8 @@ export default function HomePage() {
   const openLog = useLogSheet((s) => s.openSheet)
   const openPastLog = useLogSheet((s) => s.openForPastDate)
   const openWorkplace = useWorkplaceSheet((s) => s.openNew)
+  const { status } = useSession()
+  const guest = useGuestStatus(status === 'authenticated')
 
   const [year, m] = month.split('-').map(Number)
   const loading = !workplaces || !view
@@ -70,20 +75,48 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 주 CTA — 화면에서 유일한 검정 면 */}
-      <button
-        type="button"
-        onClick={() => (hasWorkplace ? openLog(today) : openWorkplace(true))}
-        className="flex h-16 w-full items-center justify-center gap-2 rounded-full bg-primary text-lg font-medium text-on-primary"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        {hasWorkplace ? t('cta') : t('emptyWorkplaceCta')}
-      </button>
+      {/* 게스트 기간이 끝나면 새 기록만 잠긴다. 이미 남긴 기록은 계속 보고 내보낼 수 있다 */}
+      {!guest.loading && !guest.canRecord ? (
+        <Link
+          href="/login"
+          className="flex min-h-16 w-full flex-col items-center justify-center gap-0.5 rounded-full bg-primary px-5 py-3 text-center text-on-primary"
+        >
+          <span className="text-lg font-medium">기록을 이어 쓰려면 로그인</span>
+          <span className="text-[13px] opacity-75">
+            지금까지 적은 기록은 그대로 있어요
+          </span>
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={() => (hasWorkplace ? openLog(today) : openWorkplace(true))}
+          className="flex h-16 w-full items-center justify-center gap-2 rounded-full bg-primary text-lg font-medium text-on-primary"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          {hasWorkplace ? t('cta') : t('emptyWorkplaceCta')}
+        </button>
+      )}
+
+      {!guest.loading && guest.warning && guest.canRecord && (
+        <Link
+          href="/login"
+          className="flex min-h-14 items-center gap-2.5 rounded-full bg-surface-yellow px-4 text-[14px] font-medium text-yellow-dark"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+          로그인 없이 {guest.daysLeft}일 더 쓸 수 있어요
+          <svg className="ml-auto flex-none" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </Link>
+      )}
 
       {/* 놓친 날을 나중에 적을 수 있어야 한다 — 인력사무소 일용직은 며칠씩 밀린다 */}
-      {hasWorkplace && (
+      {hasWorkplace && guest.canRecord && (
         <button
           type="button"
           onClick={() => openPastLog(today)}

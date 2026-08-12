@@ -1,5 +1,6 @@
 'use client'
 
+import { SessionProvider } from 'next-auth/react'
 import { NextIntlClientProvider } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 import { DEFAULT_LOCALE } from '@/lib/i18n/config'
@@ -30,6 +31,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   }, [locale])
 
   return (
+    <SessionProvider>
     <NextIntlClientProvider
       locale={locale}
       messages={messages}
@@ -42,6 +44,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     >
       {children}
     </NextIntlClientProvider>
+    </SessionProvider>
   )
 }
 

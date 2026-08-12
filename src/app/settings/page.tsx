@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
+import { signOut, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Screen } from '@/components/Screen'
 import { Toggle } from '@/components/workplace/WorkplaceSheet'
@@ -19,6 +20,7 @@ export default function SettingsPage() {
   const settings = useSettings()
   const showSnack = useSnackbar((s) => s.show)
   const fileRef = useRef<HTMLInputElement>(null)
+  const { data: session, status } = useSession()
 
   async function handleExport() {
     const backup = await exportBackup()
@@ -94,6 +96,44 @@ export default function SettingsPage() {
       <p className="m-0 text-[12.5px] leading-snug text-steel">
         출퇴근 시각을 넣을 때만 계산해요. 시간만 넣으면 밤 시간을 알 수 없어요.
       </p>
+
+      {/* 계정 — "로그인"이라 부르지 않는다. 사용자에게 필요한 건 기록을 지키는 것이다 */}
+      <p className="mb-[-4px] mt-2 text-[13px] font-semibold text-steel">내 계정</p>
+      {status === 'authenticated' && session?.user ? (
+        <div className="flex flex-col gap-2">
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-hairline-soft bg-canvas px-4">
+            <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-teal-light text-sm font-semibold text-moss-dark">
+              {(session.user.name ?? session.user.email ?? '?').slice(0, 1).toUpperCase()}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-[14px] font-medium">
+              {session.user.email}
+            </span>
+          </div>
+          {session.user.isAdmin && (
+            <Link
+              href="/admin"
+              className="flex min-h-14 items-center rounded-lg border border-hairline-soft bg-canvas px-4 text-[15px] font-medium"
+            >
+              관리자 화면
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => void signOut({ redirectTo: '/' })}
+            className="flex h-14 w-full items-center justify-center rounded-full border border-hairline-strong bg-canvas text-base font-medium"
+          >
+            로그아웃
+          </button>
+        </div>
+      ) : (
+        <Link
+          href="/login"
+          className="flex min-h-16 w-full flex-col items-center justify-center gap-0.5 rounded-full bg-primary py-3 text-center text-on-primary"
+        >
+          <span className="text-lg font-medium">기록 지키기</span>
+          <span className="text-[13px] opacity-75">휴대폰을 바꿔도 기록이 남아요</span>
+        </Link>
+      )}
 
       {/* 백업 — 기기 분실 = 증거 전소를 막는 최소 장치 */}
       <p className="mb-[-4px] mt-2 text-[13px] font-semibold text-steel">기록 지키기</p>
