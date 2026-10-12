@@ -121,7 +121,7 @@ export default function PrivacyPage() {
       <section>
         <h2>9. 개인정보 보호책임자</h2>
         <p>
-          책임자: {COMPANY.ceo} ({COMPANY.nameKo})
+          담당부서: {COMPANY.privacyDept} ({COMPANY.nameKo})
           <br />
           문의: 앱 내{' '}
           <Link href={COMPANY.supportPath} className="font-semibold text-brand-blue underline">

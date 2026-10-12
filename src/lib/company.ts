@@ -6,7 +6,8 @@
 export const COMPANY = {
   nameKo: '주식회사 에이티엠스토어',
   nameEn: 'ATM Store Co., Ltd.',
-  ceo: '오유진',
+  /** 개인정보 보호책임자: 개인 성명 대신 담당부서로 표기(개인정보보호법 §30) */
+  privacyDept: '운영팀 (개인정보 보호 담당)',
   businessNumber: '396-21-02113',
   mailOrderNumber: '2025-부천소사-0174',
   address: '경기도 부천시 소사로 257길 6층 C14',

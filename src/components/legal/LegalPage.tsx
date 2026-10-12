@@ -59,8 +59,6 @@ export function CompanyBlock() {
         {COMPANY.nameKo} <span className="font-normal text-steel">({COMPANY.nameEn})</span>
       </p>
       <dl className="m-0 mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-        <dt>대표자</dt>
-        <dd className="m-0">{COMPANY.ceo}</dd>
         <dt>사업자등록번호</dt>
         <dd className="tnum m-0">{COMPANY.businessNumber}</dd>
         <dt>통신판매업</dt>
